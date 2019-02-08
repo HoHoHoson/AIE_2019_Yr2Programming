@@ -3,14 +3,22 @@
 #include "Font.h"
 #include "Input.h"
 #include "PhysicsScene.h"
+#include "Sphere.h"
 #include <Gizmos.h>
 
-Hoson_sPhysXEngineApp::Hoson_sPhysXEngineApp() {
+namespace test {
+
+static int screenHeight = getWindowHeight();
+static int screenWidth = getWindowWidth();
+}
+
+Hoson_sPhysXEngineApp::Hoson_sPhysXEngineApp()
+{
 
 }
 
 Hoson_sPhysXEngineApp::~Hoson_sPhysXEngineApp() {
-
+	
 }
 
 bool Hoson_sPhysXEngineApp::startup() 
@@ -19,11 +27,23 @@ bool Hoson_sPhysXEngineApp::startup()
 	
 	m_2dRenderer = new aie::Renderer2D();
 
+	static int screenHeight = getWindowHeight();
+
 	// TODO: remember to change this when redistributing a build!
 	// the following path would be used instead: "./font/consolas.ttf"
 	m_font = new aie::Font("../bin/font/consolas.ttf", 32);
 
 	m_PhysicsScene = new PhysicsScene();
+	m_PhysicsScene->setGravity(glm::vec2(0, -9.8f));
+
+	//Sphere* ball1 = new Sphere(glm::vec2(20, 0), glm::vec2(-5, 0), 10.0f, 4, glm::vec4(1, 0, 0, 1));
+	//Sphere* ball2 = new Sphere(glm::vec2(-20, 0), glm::vec2(10, 0), 10.0f, 4, glm::vec4(0, 1, 0, 1));
+
+	//m_PhysicsScene->addActor(ball1);
+	//m_PhysicsScene->addActor(ball2);
+
+	Sphere* rocketBall = new Sphere(glm::vec2(0, 0), glm::vec2(0, 0), 10.0f, 5, glm::vec4(1, 1, 1, 1));
+	m_PhysicsScene->addActor(rocketBall);
 
 	return true;
 }
@@ -39,12 +59,37 @@ void Hoson_sPhysXEngineApp::update(float deltaTime) {
 	// input example
 	aie::Input* input = aie::Input::getInstance();
 
+	//
+	// ROCKET POWA
+	rocketPropellant += deltaTime;
+
+	Sphere* player = dynamic_cast<Sphere*>(m_PhysicsScene->getPlayer());
+	if (player->getMass() < 0)
+	{
+     	player->setMass(1.0f);
+	}
+
+  	if (input->isKeyDown(aie::INPUT_KEY_SPACE) && rocketPropellant > fuelConsumption && player->getMass() > 1.0f)
+	{
+		float decreaseMass = player->getMass() - fuelWeight;
+		player->setMass(decreaseMass);         
+
+		Sphere *gas;
+		gas = new Sphere(player->getPosition(), glm::vec2(0, fuelVelocity), fuelWeight, 1, glm::vec4(0, 0, 1, 1)); 
+		gas->applyForceToActor(player, gas->getMass() * gas->getVelocity());
+		m_PhysicsScene->addActor(gas);
+
+		rocketPropellant = 0;
+	}
+	// ROCKET POWA
+	//
+
 	// Gizmos are cleared and created each frame to simulate movement of ingame objects
 	aie::Gizmos::clear();
 
 	m_PhysicsScene->update(deltaTime);
 	m_PhysicsScene->updateGizmos();
-
+	
 	// exit the application
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();

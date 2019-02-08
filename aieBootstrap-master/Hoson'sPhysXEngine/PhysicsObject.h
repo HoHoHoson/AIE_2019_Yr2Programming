@@ -1,6 +1,13 @@
 #pragma once
 #include <glm\ext.hpp>
 
+enum ShapeType
+{
+	PLANE = 0,
+	SPHERE,
+	BOX
+};
+
 // This class is a stand in so that PhyscicsScene works properly
 class PhysicsObject
 {
@@ -13,6 +20,6 @@ public:
 
 protected:
 
-	PhysicsObject() {}
-
+	PhysicsObject(ShapeType a_shapeID) : m_ShapeID(a_shapeID) {}
+	ShapeType m_ShapeID;
 };

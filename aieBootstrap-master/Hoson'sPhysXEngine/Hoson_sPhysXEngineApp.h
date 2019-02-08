@@ -23,4 +23,10 @@ protected:
 	aie::Font*			m_font;
 
 	PhysicsScene* m_PhysicsScene;
+
+	// ROCKET POWA
+	float fuelWeight = 0.1f;
+	float fuelVelocity = -100;
+	float rocketPropellant = 0;
+	float fuelConsumption = 0.1f;
 };

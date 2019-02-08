@@ -24,6 +24,12 @@
     <ClCompile Include="..\Hoson%27sPhysXEngine\PhysicsScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Hoson%27sPhysXEngine\RigidBody.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Hoson%27sPhysXEngine\Sphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Hoson_sPhysXEngineApp.h">
@@ -33,6 +39,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Hoson%27sPhysXEngine\PhysicsObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Hoson%27sPhysXEngine\RigidBody.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Hoson%27sPhysXEngine\Sphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

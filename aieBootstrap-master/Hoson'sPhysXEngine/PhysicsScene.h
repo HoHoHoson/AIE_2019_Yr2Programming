@@ -16,8 +16,12 @@ public:
 	bool removeActor(PhysicsObject*);
 	void update(float deltaTime);
 	void updateGizmos();
+	void debugScene();
 
-	void setGravity(const glm::vec2 gravity) {}
+	void setGravity(const glm::vec2 gravity) { m_gravity = gravity; }
+
+	// ROCKET POWA
+	PhysicsObject* getPlayer() { return m_actors.front(); }
 
 protected:
 
