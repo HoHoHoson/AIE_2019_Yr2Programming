@@ -4,6 +4,7 @@
 #include "Renderer2D.h"
 
 class PhysicsScene;
+class Sphere;
 
 class Hoson_sPhysXEngineApp : public aie::Application {
 public:
@@ -25,8 +26,9 @@ protected:
 	PhysicsScene* m_PhysicsScene;
 
 	// ROCKET POWA
+	Sphere* player;
 	float fuelWeight = 0.1f;
-	float fuelVelocity = -100;
+	float fuelVelocity = -60;
+	float fuelRate = 0.1f;
 	float rocketPropellant = 0;
-	float fuelConsumption = 0.1f;
 };

@@ -5,12 +5,10 @@
 #include <list>
 #include <iostream>
 #include "Sphere.h"
-#include "Hoson_sPhysXEngineApp.h"
 
 // This constructir has an initialisation list. It can call a base class constructor and/or be used to initialise const and normal variables.
 PhysicsScene::PhysicsScene(): m_timeStep(0.01f), m_gravity(glm::vec2(0, 0))
 {
-
 }
 
 PhysicsScene::~PhysicsScene()
@@ -23,49 +21,58 @@ PhysicsScene::~PhysicsScene()
 
 void PhysicsScene::update(float deltaTime)
 {
-	static std::list<PhysicsObject*> dirty;
-
 	// This is the physics fixedUpdate function.
 	// Gives the physics simulations more precision by updating it at a set interval, instead of the more varied deltaTime, and only if sufficient time has passed.
 	static float accumulatedTime = 0.0f;
 	accumulatedTime += deltaTime;
 
-	while (accumulatedTime >= m_timeStep)
+	while (accumulatedTime >= m_timeStep && !m_actors.empty())
 	{
-		for (auto pActors : m_actors)
-		{	
-			RigidBody* pObj = dynamic_cast<RigidBody*>(pActors);
+		auto itCheck = m_actors.begin();
+		Sphere* sphereCheck;
 
-			if (pObj->getPosition().y < )
+		while (itCheck != m_actors.end())
+		{
+			sphereCheck = dynamic_cast<Sphere*>(*itCheck);
+			sphereCheck->fixedUpdate(m_gravity, m_timeStep);
 
-			pActors->fixedUpdate(m_gravity, m_timeStep);
+			if (sphereCheck->getPosition().y < 0 - m_ScreenHeight / 2)
+				itCheck = m_actors.erase(itCheck);
+			else
+				++itCheck;
 		}
 
-		//for (auto pAct : m_actors)
+		if (m_actors.empty())
+			break;
+
+		// Sphere collision detection
+		//auto iterator = m_actors.begin();
+		//itCheck = iterator++;
+
+		//sphereCheck = dynamic_cast<Sphere*>(*itCheck);
+		//Sphere* sphereOther;
+
+		//while (itCheck != m_actors.end())
 		//{
-		//	for (auto pOther : m_actors)
+		//	if (sphereCheck->checkCollision(*iterator))
 		//	{
-		//		if (pAct == pOther)
-		//		{
-		//			continue;
-		//		}
+		//		sphereOther = dynamic_cast<Sphere*>(*iterator);
+		//		sphereCheck->applyForceToActor(sphereOther, sphereCheck->getMass() * sphereCheck->getVelocity());
+		//	}
 
-		//		if (std::find(dirty.begin(), dirty.end(), pAct) != dirty.end() && std::find(dirty.begin(), dirty.end(), pOther) != dirty.end())
-		//		{
-		//			continue;
-		//		}
+		//	++iterator;
 
-		//		RigidBody* pRigid = dynamic_cast<RigidBody*>(pAct);
-		//		if (pRigid->checkCollision(pOther))
-		//		{
-		//			pRigid->applyForceToActor(dynamic_cast<RigidBody*>(pOther), pRigid->getVelocity() * pRigid->getMass());
-		//			dirty.push_back(pAct);
-		//			dirty.push_back(pOther);
-		//		}
+		//	if (iterator == m_actors.end())
+		//	{
+		//		iterator = ++itCheck;
+		//		++iterator;
+
+		//		if (iterator == m_actors.end())
+		//			++itCheck;
+		//		else
+		//			sphereCheck = dynamic_cast<Sphere*>(*itCheck);
 		//	}
 		//}
-
-		//dirty.clear();
 
 		accumulatedTime -= m_timeStep;
 	}
