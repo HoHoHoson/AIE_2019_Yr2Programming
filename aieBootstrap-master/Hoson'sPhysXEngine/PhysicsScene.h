@@ -21,8 +21,8 @@ public:
 	void setGravity(const glm::vec2 gravity) { m_gravity = gravity; }
 	void setScreenDimensions(int sWidth, int sHeight) { m_ScreenWidth = sWidth; m_ScreenHeight = sHeight; }
 
-	// ROCKET POWA
-	PhysicsObject* getPlayer() { return m_actors.front(); }
+	//// ROCKET POWA
+	/*PhysicsObject* getPlayer() { return m_actors.front(); }*/
 
 protected:
 

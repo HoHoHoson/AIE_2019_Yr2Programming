@@ -5,6 +5,8 @@
 #include "PhysicsScene.h"
 #include "Sphere.h"
 #include <Gizmos.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 Hoson_sPhysXEngineApp::Hoson_sPhysXEngineApp()
 {
@@ -27,17 +29,19 @@ bool Hoson_sPhysXEngineApp::startup()
 
 	m_PhysicsScene = new PhysicsScene();
 	m_PhysicsScene->setScreenDimensions(getWindowWidth(), getWindowHeight());
-	m_PhysicsScene->setGravity(glm::vec2(0, -9.8f));
+	m_PhysicsScene->setGravity(glm::vec2(0, -10));
 
-	//Sphere* ball1 = new Sphere(glm::vec2(20, 0), glm::vec2(-5, 0), 10.0f, 4, glm::vec4(1, 0, 0, 1));
-	//Sphere* ball2 = new Sphere(glm::vec2(-20, 0), glm::vec2(10, 0), 10.0f, 4, glm::vec4(0, 1, 0, 1));
+	//// ROCKET POWA ////
+	//player = new Sphere(glm::vec2(0, 0), glm::vec2(0, 0), 10.0f, 5, glm::vec4(1, 1, 1, 1));
+	//m_PhysicsScene->addActor(player);
 
-	//m_PhysicsScene->addActor(ball1);
-	//m_PhysicsScene->addActor(ball2);
+	float xSpeed = cosf(45.0f / 180 * M_PI) * 35;
+	float ySpeed = sinf(45.0f / 180 * M_PI) * 35;
 
-	// ROCKET POWA
-	player = new Sphere(glm::vec2(0, 0), glm::vec2(0, 0), 10.0f, 5, glm::vec4(1, 1, 1, 1));
-	m_PhysicsScene->addActor(player);
+	Sphere* testProjectile = new Sphere(glm::vec2(-40, 0), glm::vec2(xSpeed, ySpeed), 1, 1, glm::vec4(1, 1, 1, 1));
+	m_PhysicsScene->addActor(testProjectile);
+
+	projectileArcDemo(glm::vec2(-40, 0), 45, 35, -10);
 
 	return true;
 }
@@ -54,34 +58,35 @@ void Hoson_sPhysXEngineApp::update(float deltaTime) {
 	aie::Input* input = aie::Input::getInstance();
 
 	//
-	// ROCKET POWA
-	rocketPropellant += deltaTime;
+	//// ROCKET POWA ////
+	//rocketPropellant += deltaTime;
 
-	if (player->getMass() < 0)
-	{
-     	player->setMass(1.0f);
-	}
+	//if (player->getMass() < 0)
+	//{
+	//    	player->setMass(1.0f);
+	//}
 
-  	if (player->getMass() > 1.0f && input->isKeyDown(aie::INPUT_KEY_SPACE) && rocketPropellant > fuelRate)
-	{
-		float decreaseMass = player->getMass() - fuelWeight;
-		player->setMass(decreaseMass);         
+ // 	if (player->getMass() > 1.0f && input->isKeyDown(aie::INPUT_KEY_SPACE) && rocketPropellant > fuelRate)
+	//{
+	//	float decreaseMass = player->getMass() - fuelWeight;
+	//	player->setMass(decreaseMass);         
 
-		Sphere *gas;
-   		gas = new Sphere(player->getPosition(), glm::vec2(0, fuelVelocity), fuelWeight, 1, glm::vec4(0, 0, 1, 1)); 
-		gas->applyForceToActor(player, gas->getMass() * gas->getVelocity());
-		m_PhysicsScene->addActor(gas);
+	//	Sphere *gas;
+ //  		gas = new Sphere(player->getPosition(), glm::vec2(0, fuelVelocity), fuelWeight, 1, glm::vec4(0, 0, 1, 1)); 
+	//	gas->applyForceToActor(player, gas->getMass() * gas->getVelocity());
+	//	m_PhysicsScene->addActor(gas);
 
-		rocketPropellant = 0;
-	}
-	// ROCKET POWA
+	//	rocketPropellant = 0;
+	//}
+	//// ROCKET POWA ////
 	//
 
 	// Gizmos are cleared and created each frame to simulate movement of ingame objects
-	aie::Gizmos::clear();
+	//aie::Gizmos::clear();
 
+	// Commented updateGizmos to demonstrate descrete simulation comparison with numerical intergration
 	m_PhysicsScene->update(deltaTime);
-	m_PhysicsScene->updateGizmos();
+	//m_PhysicsScene->updateGizmos();
 	
 	// exit the application
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
@@ -107,3 +112,25 @@ void Hoson_sPhysXEngineApp::draw() {
 	// done drawing sprites
 	m_2dRenderer->end();
 }
+
+void Hoson_sPhysXEngineApp::projectileArcDemo(glm::vec2 startPos, float inclination, float speed, float gravity)
+{
+	float t = 0;
+	float tStep = 0.5f;
+	float radius = 1.0f;
+	int segments = 12;
+	float xSpeed = cosf(inclination / 180 * M_PI) * speed;
+	float ySpeed = sinf(inclination / 180 * M_PI) * speed;
+	glm::vec2 pos = startPos;
+	glm::vec4 colour(1, 1, 0, 1);
+
+	while (t <= 5)
+	{
+		pos.x = startPos.x + xSpeed * t;
+		pos.y = startPos.y + ySpeed * t + 0.5 * gravity * powf(t, 2);
+
+		aie::Gizmos::add2DCircle(pos, radius, segments, colour);
+		t += tStep;
+	}
+}
+

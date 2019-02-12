@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "Renderer2D.h"
+#include <glm\ext.hpp>
 
 class PhysicsScene;
 class Sphere;
@@ -18,6 +19,8 @@ public:
 	virtual void update(float deltaTime);
 	virtual void draw();
 
+	void projectileArcDemo(glm::vec2 startPos, float inclination, float speed, float gravity);
+
 protected:
 
 	aie::Renderer2D*	m_2dRenderer;
@@ -25,10 +28,10 @@ protected:
 
 	PhysicsScene* m_PhysicsScene;
 
-	// ROCKET POWA
-	Sphere* player;
-	float fuelWeight = 0.1f;
-	float fuelVelocity = -60;
-	float fuelRate = 0.1f;
-	float rocketPropellant = 0;
+	//// ROCKET POWA ////
+	//Sphere* player;
+	//float fuelWeight = 0.1f;
+	//float fuelVelocity = -65;
+	//float fuelRate = 0.1f;
+	//float rocketPropellant = 0;
 };

@@ -7,8 +7,9 @@
 #include "Sphere.h"
 
 // This constructir has an initialisation list. It can call a base class constructor and/or be used to initialise const and normal variables.
-PhysicsScene::PhysicsScene(): m_timeStep(0.01f), m_gravity(glm::vec2(0, 0))
+PhysicsScene::PhysicsScene(): m_timeStep(0.5f), m_gravity(glm::vec2(0, 0))
 {
+	// Adjusted timestep from 0.01f to 0.5f for projectiles demo
 }
 
 PhysicsScene::~PhysicsScene()
@@ -23,7 +24,7 @@ void PhysicsScene::update(float deltaTime)
 {
 	// This is the physics fixedUpdate function.
 	// Gives the physics simulations more precision by updating it at a set interval, instead of the more varied deltaTime, and only if sufficient time has passed.
-	static float accumulatedTime = 0.0f;
+	static float accumulatedTime = 0.5f;
 	accumulatedTime += deltaTime;
 
 	while (accumulatedTime >= m_timeStep && !m_actors.empty())
@@ -35,7 +36,7 @@ void PhysicsScene::update(float deltaTime)
 		{
 			sphereCheck = dynamic_cast<Sphere*>(*itCheck);
 			sphereCheck->fixedUpdate(m_gravity, m_timeStep);
-
+			updateGizmos();
 			if (sphereCheck->getPosition().y < 0 - m_ScreenHeight / 2)
 				itCheck = m_actors.erase(itCheck);
 			else
