@@ -10,13 +10,13 @@ public:
 	virtual void debug() {};
 	void applyForce(glm::vec2 force);
 	void applyForceToActor(RigidBody* actor2, glm::vec2 force);
-	virtual bool checkCollision(PhysicsObject* pOther) = 0;
 
 	glm::vec2 getPosition() { return m_Position; }
 	glm::vec2 getVelocity() { return m_Velocity; }
 	float getRotation() { return m_Rotation; }
 	float getMass() { return m_Mass; }
 
+	void setVelocity(glm::vec2 newVel) { m_Velocity = newVel; }
 	// ROCKET POWA
 	void setMass(float newMass) { m_Mass = newMass; }
 

@@ -4,6 +4,7 @@
 #include "Input.h"
 #include "PhysicsScene.h"
 #include "Sphere.h"
+#include "Plane.h"
 #include <Gizmos.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -29,19 +30,25 @@ bool Hoson_sPhysXEngineApp::startup()
 
 	m_PhysicsScene = new PhysicsScene();
 	m_PhysicsScene->setScreenDimensions(getWindowWidth(), getWindowHeight());
-	m_PhysicsScene->setGravity(glm::vec2(0, -10));
+	m_PhysicsScene->setGravity(glm::vec2(0, 0));
 
-	//// ROCKET POWA ////
+	Sphere* spaceCore1 = new Sphere(glm::vec2(-40, 0), glm::vec2(10, 0), 1, 10.0f, glm::vec4(1, 0, 0, 1));
+	m_PhysicsScene->addActor(spaceCore1);
+	//Sphere* spaceCore2 = new Sphere(glm::vec2(40, 0), glm::vec2(-10, 0), 1, 10.0f, glm::vec4(0, 1, 0, 1));
+	//m_PhysicsScene->addActor(spaceCore2);
+	Plane* plane1 = new Plane(glm::vec2(1, 1), 5);
+	m_PhysicsScene->addActor(plane1);
+
+	/// ROCKET POWA
 	//player = new Sphere(glm::vec2(0, 0), glm::vec2(0, 0), 10.0f, 5, glm::vec4(1, 1, 1, 1));
 	//m_PhysicsScene->addActor(player);
 
-	float xSpeed = cosf(45.0f / 180 * M_PI) * 35;
-	float ySpeed = sinf(45.0f / 180 * M_PI) * 35;
-
-	Sphere* testProjectile = new Sphere(glm::vec2(-40, 0), glm::vec2(xSpeed, ySpeed), 1, 1, glm::vec4(1, 1, 1, 1));
-	m_PhysicsScene->addActor(testProjectile);
-
-	projectileArcDemo(glm::vec2(-40, 0), 45, 35, -10);
+	/// Code below is for the projectiles demo
+	//float xSpeed = cosf(45.0f / 180 * M_PI) * 35;
+	//float ySpeed = sinf(45.0f / 180 * M_PI) * 35;
+	//Sphere* testProjectile = new Sphere(glm::vec2(-40, 0), glm::vec2(xSpeed, ySpeed), 1, 1, glm::vec4(1, 1, 1, 1));
+	//m_PhysicsScene->addActor(testProjectile);
+	//projectileArcDemo(glm::vec2(-40, 0), 45, 35, -10);
 
 	return true;
 }
@@ -82,11 +89,12 @@ void Hoson_sPhysXEngineApp::update(float deltaTime) {
 	//
 
 	// Gizmos are cleared and created each frame to simulate movement of ingame objects
-	//aie::Gizmos::clear();
+	aie::Gizmos::clear();
 
 	// Commented updateGizmos to demonstrate descrete simulation comparison with numerical intergration
 	m_PhysicsScene->update(deltaTime);
-	//m_PhysicsScene->updateGizmos();
+	m_PhysicsScene->updateGizmos();
+	m_PhysicsScene->checkForCollision();
 	
 	// exit the application
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))

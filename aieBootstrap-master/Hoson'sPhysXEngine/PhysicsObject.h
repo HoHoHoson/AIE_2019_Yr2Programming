@@ -5,10 +5,10 @@ enum ShapeType
 {
 	PLANE = 0,
 	SPHERE,
-	BOX
+	BOX,
+	SHAPE_COUNT
 };
 
-// This class is a stand in so that PhyscicsScene works properly
 class PhysicsObject
 {
 public:
@@ -17,6 +17,8 @@ public:
 	virtual void debug() = 0;
 	virtual void makeGizmo() = 0;
 	virtual void resetPosition() {};
+
+	ShapeType getShapeID() { return m_ShapeID; }
 
 protected:
 

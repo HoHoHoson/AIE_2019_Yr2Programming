@@ -164,6 +164,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Hoson%27sPhysXEngine\PhysicsScene.cpp" />
+    <ClCompile Include="..\Hoson%27sPhysXEngine\Plane.cpp" />
     <ClCompile Include="..\Hoson%27sPhysXEngine\RigidBody.cpp" />
     <ClCompile Include="..\Hoson%27sPhysXEngine\Sphere.cpp" />
     <ClCompile Include="Hoson_sPhysXEngineApp.cpp" />
@@ -172,6 +173,7 @@
   <ItemGroup>
     <ClInclude Include="..\Hoson%27sPhysXEngine\PhysicsObject.h" />
     <ClInclude Include="..\Hoson%27sPhysXEngine\PhysicsScene.h" />
+    <ClInclude Include="..\Hoson%27sPhysXEngine\Plane.h" />
     <ClInclude Include="..\Hoson%27sPhysXEngine\RigidBody.h" />
     <ClInclude Include="..\Hoson%27sPhysXEngine\Sphere.h" />
     <ClInclude Include="Hoson_sPhysXEngineApp.h" />
