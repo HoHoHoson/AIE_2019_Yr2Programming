@@ -33,6 +33,9 @@
     <ClCompile Include="..\Hoson%27sPhysXEngine\Plane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Hoson%27sPhysXEngine\Box.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Hoson_sPhysXEngineApp.h">
@@ -51,6 +54,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Hoson%27sPhysXEngine\Plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Hoson%27sPhysXEngine\Box.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

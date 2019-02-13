@@ -5,6 +5,7 @@
 #include "PhysicsScene.h"
 #include "Sphere.h"
 #include "Plane.h"
+#include "Box.h"
 #include <Gizmos.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -36,8 +37,12 @@ bool Hoson_sPhysXEngineApp::startup()
 	m_PhysicsScene->addActor(spaceCore1);
 	//Sphere* spaceCore2 = new Sphere(glm::vec2(40, 0), glm::vec2(-10, 0), 1, 10.0f, glm::vec4(0, 1, 0, 1));
 	//m_PhysicsScene->addActor(spaceCore2);
-	Plane* plane1 = new Plane(glm::vec2(1, 1), 5);
-	m_PhysicsScene->addActor(plane1);
+	//Plane* plane1 = new Plane(glm::vec2(1, 1), 5);
+	//m_PhysicsScene->addActor(plane1);
+	Box* companionCube = new Box(glm::vec2(0, 40), glm::vec2(0, -10), 1, glm::vec2(100, 5), glm::vec4(0, 1, 0, 1));
+	m_PhysicsScene->addActor(companionCube);
+	Box* companionCube2 = new Box(glm::vec2(0, -40), glm::vec2(0, 10), 1, glm::vec2(5, 5), glm::vec4(0, 0, 1, 1));
+	m_PhysicsScene->addActor(companionCube2);
 
 	/// ROCKET POWA
 	//player = new Sphere(glm::vec2(0, 0), glm::vec2(0, 0), 10.0f, 5, glm::vec4(1, 1, 1, 1));

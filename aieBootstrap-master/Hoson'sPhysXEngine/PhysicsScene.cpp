@@ -6,6 +6,7 @@
 #include <iostream>
 #include "Sphere.h"
 #include "Plane.h"
+#include "Box.h"
 
 // This constructir has an initialisation list. It can call a base class constructor and/or be used to initialise const and normal variables.
 PhysicsScene::PhysicsScene(): m_timeStep(0.01f), m_gravity(glm::vec2(0, 0))
@@ -43,7 +44,7 @@ void PhysicsScene::update(float deltaTime)
 			{
 				RigidBody* rb = dynamic_cast<RigidBody*>(*itCheck);
 				assert(rb != nullptr);
-
+				
 				rb->fixedUpdate(m_gravity, m_timeStep);
 
 				if (rb->getPosition().y < 0 - m_ScreenHeight / 2)
@@ -175,7 +176,36 @@ bool PhysicsScene::planeToSphere(PhysicsObject * obj1, PhysicsObject * obj2)
 
 bool PhysicsScene::planeToBox(PhysicsObject * obj1, PhysicsObject * obj2)
 {
-	return false;
+	Plane* p = dynamic_cast<Plane*>(obj1);
+	Box* b = dynamic_cast<Box*>(obj2);
+	assert(p != nullptr && b != nullptr);
+
+	glm::vec2 pNormal = p->getNormal();
+	float pDistance = p->getDistance();
+
+	glm::vec2 bPos = b->getPosition();
+	glm::vec2 bExtents = b->getExtents();
+
+	if ((glm::dot(pNormal, bPos) - pDistance) < 0)
+	{
+		pDistance *= -1;
+		pNormal *= -1;
+	}
+
+	float b1 = glm::dot(pNormal, bPos + bExtents) - pDistance;
+	float b2 = glm::dot(pNormal, bPos - bExtents) - pDistance;
+	float b3 = glm::dot(pNormal, glm::vec2(bPos.x + bExtents.x, bPos.y - bExtents.y)) - pDistance;
+	float b4 = glm::dot(pNormal, glm::vec2(bPos.x - bExtents.x, bPos.y + bExtents.y)) - pDistance;
+
+	if (b1 > 0 && b2 > 0 && b3 > 0 && b4 > 0)
+	{
+		return false;
+	}
+	else
+	{
+		b->setVelocity(glm::vec2(0, 0));
+		return true;
+	}
 }
 
 bool PhysicsScene::sphereToPlane(PhysicsObject * obj1, PhysicsObject * obj2)
@@ -210,20 +240,80 @@ bool PhysicsScene::sphereToSphere(PhysicsObject* obj1, PhysicsObject* obj2)
 
 bool PhysicsScene::sphereToBox(PhysicsObject * obj1, PhysicsObject * obj2)
 {
-	return false;
+	Sphere* s = dynamic_cast<Sphere*>(obj1);
+	Box* b = dynamic_cast<Box*>(obj2);
+	assert(s != nullptr && b != nullptr);
+
+	float xMax = b->getPosition().x + b->getExtents().x;
+	float xMin = b->getPosition().x - b->getExtents().x;
+	float yMax = b->getPosition().y + b->getExtents().y;
+	float yMin = b->getPosition().y - b->getExtents().y;
+
+	glm::vec2 closestPoint(s->getPosition());
+
+	if (closestPoint.x > xMax)
+		closestPoint.x = xMax;
+	else if (closestPoint.x < xMin)
+		closestPoint.x = xMin;
+
+	if (closestPoint.y > yMax)
+		closestPoint.y = yMax;
+	else if (closestPoint.y < yMin)
+		closestPoint.y = yMin;
+
+	closestPoint -= s->getPosition();
+	float mag2 = powf(closestPoint.x, 2) + powf(closestPoint.y, 2);
+
+	if (mag2 <= powf(s->getRadius(), 2))
+	{
+		s->setVelocity(glm::vec2(0, 0));
+		b->setVelocity(glm::vec2(0, 0));
+
+		return true;
+	}
+	else
+		return false;
 }
 
 bool PhysicsScene::boxToPlane(PhysicsObject * obj1, PhysicsObject * obj2)
 {
+	planeToBox(obj2, obj1);
+
 	return false;
 }
 
 bool PhysicsScene::boxToSphere(PhysicsObject * obj1, PhysicsObject * obj2)
 {
+	sphereToBox(obj2, obj1);
+
 	return false;
 }
 
 bool PhysicsScene::boxToBox(PhysicsObject * obj1, PhysicsObject * obj2)
 {
-	return false;
+	Box* b1 = dynamic_cast<Box*>(obj1);
+	Box* b2 = dynamic_cast<Box*>(obj2);
+	assert(b1 != nullptr && b2 != nullptr);
+
+	float b1_xMax = b1->getPosition().x + b1->getExtents().x;
+	float b1_xMin = b1->getPosition().x - b1->getExtents().x;
+	float b1_yMax = b1->getPosition().y + b1->getExtents().y;
+	float b1_yMin = b1->getPosition().y - b1->getExtents().y;
+	float b2_xMax = b2->getPosition().x + b2->getExtents().x;
+	float b2_xMin = b2->getPosition().x - b2->getExtents().x;
+	float b2_yMax = b2->getPosition().y + b2->getExtents().y;
+	float b2_yMin = b2->getPosition().y - b2->getExtents().y;
+
+	if (b1_xMax < b2_xMin || b2_xMax < b1_xMin ||
+		b1_yMax < b2_yMin || b2_yMax < b1_yMin)
+	{
+		return false;
+	}
+	else
+	{
+		b1->setVelocity(glm::vec2(0, 0));
+		b2->setVelocity(glm::vec2(0, 0));
+
+		return true;
+	}
 }

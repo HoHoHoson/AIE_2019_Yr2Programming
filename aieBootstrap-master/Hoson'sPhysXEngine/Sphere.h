@@ -8,7 +8,7 @@
 	 Sphere(glm::vec2 position, glm::vec2 velocity, float mass, float radius, glm::vec4 colour);
 	 ~Sphere() {}
 
-	 virtual void makeGizmo();
+	 void makeGizmo();
 
 	 float getRadius() { return m_Radius; }
 	 glm::vec4 getColour() { return m_Colour; }
