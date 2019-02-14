@@ -4,7 +4,7 @@
 class Box : public RigidBody
 {
 public:
-	Box(glm::vec2 pos, glm::vec2 vel, float mass, glm::vec2 extents, glm::vec4 colour);
+	Box(glm::vec2 pos, glm::vec2 vel, float mass, glm::vec2 extents, float drag, float angularDrag, glm::vec4 colour, float elasticity = 1);
 	~Box() {}
 
 	void makeGizmo();

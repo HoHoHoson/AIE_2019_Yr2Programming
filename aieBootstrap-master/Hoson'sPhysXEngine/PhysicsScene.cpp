@@ -16,6 +16,7 @@ PhysicsScene::PhysicsScene(): m_timeStep(0.01f), m_gravity(glm::vec2(0, 0))
 
 PhysicsScene::~PhysicsScene()
 {
+	// Deletes all physics object pointers
 	for (auto pAct : m_actors)
 	{
 		delete pAct;
@@ -126,6 +127,7 @@ void PhysicsScene::checkForCollision()
 {
 	int actorCount = (int)m_actors.size();
 
+	// Calls the corresponding function in the function array depending on SHAPE ID
 	for (int outer = 0; outer < actorCount - 1; outer++)
 		for (int inner = outer + 1; inner < actorCount; inner++)
 		{
@@ -166,7 +168,11 @@ bool PhysicsScene::planeToSphere(PhysicsObject * obj1, PhysicsObject * obj2)
 
 	if (dis - s->getRadius() <= 0)
 	{
-		s->setVelocity(glm::vec2(0, 0));
+		// Restitution of intersected postions after colliding
+		glm::vec2 planeIntersect = s->getPosition() - (planeNormal * dis);
+		s->setPosition(planeIntersect + planeNormal * s->getRadius());
+
+		p->resolveCollision(planeNormal, s);
 
 		return true;
 	}
@@ -228,8 +234,15 @@ bool PhysicsScene::sphereToSphere(PhysicsObject* obj1, PhysicsObject* obj2)
 
 		if (mag2 <= radii2)
 		{
-			s1->setVelocity(glm::vec2(0, 0));
-			s2->setVelocity(glm::vec2(0, 0));
+			// Restitution of intersected postions after colliding
+			float intersectLength = (sqrtf(radii2) - sqrtf(mag2));
+			glm::vec2 collisionNormal = glm::normalize(s2->getPosition() - s1->getPosition());
+			float totalMass = s1->getMass() + s2->getMass();
+
+			s1->setPosition(s1->getPosition() - ((s1->getMass() / totalMass) * intersectLength) * collisionNormal);
+			s2->setPosition(s2->getPosition() + ((s2->getMass() / totalMass) * intersectLength) * collisionNormal);
+
+			s1->resolveCollision(s2);
 
 			return true;
 		}
