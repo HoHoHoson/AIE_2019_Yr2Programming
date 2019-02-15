@@ -33,12 +33,12 @@ bool Hoson_sPhysXEngineApp::startup()
 	m_PhysicsScene->setScreenDimensions(getWindowWidth(), getWindowHeight());
 	m_PhysicsScene->setGravity(glm::vec2(0, -10));
 
-	Sphere* spaceCore1 = new Sphere(glm::vec2(0, 20), glm::vec2(0, -5), 10, 10, 0, 0, glm::vec4(1, 0, 0, 1), 1.1f);
+	Sphere* spaceCore1 = new Sphere(glm::vec2(0, 20), glm::vec2(0, -5), 10, 10, 0, 0, glm::vec4(1, 0, 0, 1), 0.5f);
 	m_PhysicsScene->addActor(spaceCore1);
-	Sphere* spaceCore2 = new Sphere(glm::vec2(20, 0), glm::vec2(0, -5), 1.0f, 10, 0, 0, glm::vec4(0, 1, 0, 1), 1.1f);
-	m_PhysicsScene->addActor(spaceCore2);
-	Sphere* spaceCore3 = new Sphere(glm::vec2(-20, 0), glm::vec2(0, -5), 1.0f, 10, 0, 0, glm::vec4(0, 0, 1, 1), 1.1f);
-	m_PhysicsScene->addActor(spaceCore3);
+	//Sphere* spaceCore2 = new Sphere(glm::vec2(20, 0), glm::vec2(0, -5), 1.0f, 10, 0, 0, glm::vec4(0, 1, 0, 1), 1.0f);
+	//m_PhysicsScene->addActor(spaceCore2);
+	//Sphere* spaceCore3 = new Sphere(glm::vec2(-20, 0), glm::vec2(0, -5), 1.0f, 10, 0, 0, glm::vec4(0, 0, 1, 1), 1.0f);
+	//m_PhysicsScene->addActor(spaceCore3);
 
 	Plane* plane1 = new Plane(glm::vec2(1, 10), 50);
 	m_PhysicsScene->addActor(plane1);

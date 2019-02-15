@@ -8,8 +8,7 @@ public:
 
 	virtual void fixedUpdate(glm::vec2 gravity, float timeStep);
 	virtual void debug() {};
-	void applyForce(glm::vec2 force);
-	void applyForceToActor(RigidBody* actor2, glm::vec2 force);
+	void applyForce(glm::vec2 force, glm::vec2 position);
 
 	glm::vec2 getPosition() { return m_Position; }
 	glm::vec2 getVelocity() { return m_Velocity; }
@@ -18,6 +17,8 @@ public:
 	float getLinearDrag() { return m_LinearDrag; }
 	float getAngularDrag() { return m_AngularDrag; }
 	float getElasticity() { return m_Elasticity; }
+	float getAngularVelocity() { return m_AngularVelocity; }
+	float getMoment() { return m_Moment; }
 
 	void setPosition(glm::vec2 newPos) { m_Position = newPos; }
 	void setVelocity(glm::vec2 newVel) { m_Velocity = newVel; }
@@ -25,7 +26,7 @@ public:
 	float setLinearDrag(float newValue) { m_LinearDrag = newValue; }
 	float setAngularDrag(float newValue) { m_AngularDrag = newValue; }
 
-	void resolveCollision(RigidBody* other);
+	void resolveCollision(RigidBody* other, glm::vec2 contact, glm::vec2* collisionNormal = nullptr);
 
 protected:
 
@@ -34,8 +35,9 @@ protected:
 	float m_LinearDrag;
 
 	float m_Rotation;
-	// Add in the future: m_AngularVelocity;
+	float m_AngularVelocity;
 	float m_AngularDrag;
+	float m_Moment;
 
 	float m_Mass;
 	float m_Elasticity;

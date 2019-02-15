@@ -24,10 +24,10 @@ void Plane::makeGizmo()
 	aie::Gizmos::add2DLine(start, end, colour);
 }
 
-void Plane::resolveCollision(glm::vec2 normal, RigidBody * other)
+void Plane::resolveCollision(glm::vec2 normal, RigidBody * other, glm::vec2 contact)
 {
 	float j = glm::dot(-(1 + other->getElasticity()) * other->getVelocity(), normal) / (1 / other->getMass());
 	glm::vec2 force = j * normal;
 
-	other->applyForce(force);
+	other->applyForce(force, contact - other->getPosition());
 }
