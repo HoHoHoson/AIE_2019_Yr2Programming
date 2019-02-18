@@ -12,7 +12,7 @@ Plane::~Plane()
 {
 }
 
-void Plane::makeGizmo()
+void Plane::makeGizmo() const
 {
 	float lineSegmentLength = 300;
 	glm::vec2 centerPoint = m_Normal * m_DistanceToOrigin;

@@ -7,7 +7,7 @@ Box::Box(glm::vec2 pos, glm::vec2 vel, float mass, glm::vec2 extents, float drag
 	m_Colour = colour;
 }
 
-void Box::makeGizmo()
+void Box::makeGizmo() const
 {
 	glm::vec2 p1 = m_Position - m_LocalX * m_Extents.x - m_LocalY * m_Extents.y;
 	glm::vec2 p2 = m_Position + m_LocalX * m_Extents.x - m_LocalY * m_Extents.y;

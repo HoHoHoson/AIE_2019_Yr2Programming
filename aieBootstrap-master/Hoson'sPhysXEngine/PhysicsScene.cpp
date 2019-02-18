@@ -65,7 +65,7 @@ void PhysicsScene::update(float deltaTime)
 	}
 }
 
-void PhysicsScene::updateGizmos()
+void PhysicsScene::updateGizmos() const
 {
 	for (auto pActor : m_actors)
 	{
@@ -123,7 +123,7 @@ static fn collisionFunctionArray[] =
 	PhysicsScene::boxToPlane, PhysicsScene::boxToSphere, PhysicsScene::boxToBox,
 };
 
-void PhysicsScene::checkForCollision()
+void PhysicsScene::checkForCollision() const
 {
 	int actorCount = (int)m_actors.size();
 

@@ -7,14 +7,14 @@ public:
 	Box(glm::vec2 pos, glm::vec2 vel, float mass, glm::vec2 extents, float drag, float angularDrag, glm::vec4 colour, float elasticity = 1);
 	~Box() {}
 
-	void makeGizmo();
+	void makeGizmo() const;
 	void fixedUpdate(glm::vec2 gravity, float timeStep);
 	void debug() {}
 
-	glm::vec2 getExtents()const { return m_Extents; }
-	glm::vec4 getColour() { return m_Colour; }
-	glm::vec2 getLocalX() { return m_LocalX; }
-	glm::vec2 getLocalY() { return m_LocalY; }
+	glm::vec2 getExtents()	const { return m_Extents; }
+	glm::vec4 getColour()	const { return m_Colour; }
+	glm::vec2 getLocalX()	const { return m_LocalX; }
+	glm::vec2 getLocalY()	const { return m_LocalY; }
 
 	bool checkBoxCorners(const Box& box, glm::vec2& contact, int& numContacts, float& pen, glm::vec2& edgeNormal);
 

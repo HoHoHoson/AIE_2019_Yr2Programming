@@ -18,7 +18,7 @@ public:
 	virtual void makeGizmo() = 0;
 	virtual void resetPosition() {};
 
-	ShapeType getShapeID() { return m_ShapeID; }
+	ShapeType getShapeID()const { return m_ShapeID; }
 
 protected:
 

@@ -11,11 +11,11 @@ public:
 
 	virtual void fixedUpdate(glm::vec2 gravity, float timeStep) {}
 	virtual void debug() {}
-	virtual void makeGizmo();
+	virtual void makeGizmo() const;
 	virtual void resetPosition() {}
 
-	glm::vec2 getNormal() { return m_Normal; }
-	float getDistance() { return m_DistanceToOrigin; }
+	glm::vec2 getNormal()	const { return m_Normal; }
+	float getDistance()		const { return m_DistanceToOrigin; }
 
 	void resolveCollision(glm::vec2 normal, RigidBody* other, glm::vec2 contact);
 

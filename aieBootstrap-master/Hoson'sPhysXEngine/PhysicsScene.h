@@ -15,13 +15,13 @@ public:
 	bool addActor(PhysicsObject*);
 	bool removeActor(PhysicsObject*);
 	void update(float deltaTime);
-	void updateGizmos();
+	void updateGizmos() const;
 	void debugScene();
 
 	void setGravity(const glm::vec2 gravity) { m_gravity = gravity; }
 	void setScreenDimensions(int sWidth, int sHeight) { m_ScreenWidth = sWidth; m_ScreenHeight = sHeight; }
 
-	void checkForCollision();
+	void checkForCollision() const;
 
 	static bool planeToPlane(PhysicsObject* obj1, PhysicsObject* obj2);
 	static bool planeToSphere(PhysicsObject* obj1, PhysicsObject* obj2);
@@ -32,9 +32,6 @@ public:
 	static bool boxToPlane(PhysicsObject* obj1, PhysicsObject* obj2);
 	static bool boxToSphere(PhysicsObject* obj1, PhysicsObject* obj2);
 	static bool boxToBox(PhysicsObject* obj1, PhysicsObject* obj2);
-
-	//// ROCKET POWA
-	/*PhysicsObject* getPlayer() { return m_actors.front(); }*/
 
 protected:
 
