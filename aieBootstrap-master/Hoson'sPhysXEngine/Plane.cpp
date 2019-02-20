@@ -12,7 +12,7 @@ Plane::~Plane()
 {
 }
 
-void Plane::makeGizmo() const
+void Plane::makeGizmo()
 {
 	float lineSegmentLength = 300;
 	glm::vec2 centerPoint = m_Normal * m_DistanceToOrigin;
@@ -26,7 +26,7 @@ void Plane::makeGizmo() const
 
 void Plane::resolveCollision(glm::vec2 normal, RigidBody * other, glm::vec2 contact)
 {
-	float j = glm::dot(-(1 + other->getElasticity()) * other->getVelocity(), normal) / (1 / other->getMass());
+	float j = glm::dot(-(1.0f + other->getElasticity()) * other->getVelocity(), normal) / (1 / other->getMass());
 	glm::vec2 force = j * normal;
 
 	other->applyForce(force, contact - other->getPosition());

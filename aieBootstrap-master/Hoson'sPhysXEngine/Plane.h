@@ -11,7 +11,7 @@ public:
 
 	virtual void fixedUpdate(glm::vec2 gravity, float timeStep) {}
 	virtual void debug() {}
-	virtual void makeGizmo() const;
+	virtual void makeGizmo();
 	virtual void resetPosition() {}
 
 	glm::vec2 getNormal()	const { return m_Normal; }

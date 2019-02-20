@@ -166,15 +166,23 @@ bool PhysicsScene::planeToSphere(PhysicsObject * obj1, PhysicsObject * obj2)
 		dis *= -1;
 	}
 
-	if (dis - s->getRadius() <= 0)
+	if (dis - s->getRadius() < 0)
 	{
 		// Restitution of intersected postions after colliding
 		glm::vec2 planeIntersect = s->getPosition() - (planeNormal * dis);
 		s->setPosition(planeIntersect + planeNormal * s->getRadius());
 
-		glm::vec2 contact = s->getPosition() + (planeNormal * s->getRadius());
+		float KEpreCollision = s->getKineticEnergy();
 
-		p->resolveCollision(planeNormal, s, contact);
+		p->resolveCollision(planeNormal, s, planeIntersect);
+
+		float KEpostCollision = s->getKineticEnergy();
+		float KEdelta = KEpostCollision - KEpreCollision;
+
+		if (KEdelta < -0.01f || KEdelta > 0.01f)
+		{
+			std::cout << "Plane-Sphere Energy Change Detected" << std::endl;
+		}
 
 		return true;
 	}
@@ -245,29 +253,37 @@ bool PhysicsScene::sphereToSphere(PhysicsObject* obj1, PhysicsObject* obj2)
 {
 	Sphere* s1 = dynamic_cast<Sphere*>(obj1);
 	Sphere* s2 = dynamic_cast<Sphere*>(obj2);
+	assert(s1 != nullptr && s2 != nullptr);
 
-	if (s1 != nullptr && s2 != nullptr)
+	glm::vec2 dis = s2->getPosition() - s1->getPosition();
+	float mag2 = powf(dis.x, 2) + powf(dis.y, 2);
+	float radii2 = powf(s1->getRadius() + s2->getRadius(), 2);
+
+	if (mag2 < radii2)
 	{
-		glm::vec2 dis = s2->getPosition() - s1->getPosition();
-		float mag2 = powf(dis.x, 2) + powf(dis.y, 2);
-		float radii2 = powf(s1->getRadius() + s2->getRadius(), 2);
+		// Restitution of intersected postions after colliding
+		float intersectLength = (sqrtf(radii2) - sqrtf(mag2));
+		glm::vec2 collisionNormal = glm::normalize(s2->getPosition() - s1->getPosition());
+		float totalMass = s1->getMass() + s2->getMass();
 
-		if (mag2 <= radii2)
+		s1->setPosition(s1->getPosition() - (((1 - (s1->getMass()) / totalMass)) * intersectLength) * collisionNormal);
+		s2->setPosition(s2->getPosition() + (((1 - (s2->getMass()) / totalMass)) * intersectLength) * collisionNormal);
+
+		glm::vec2 contact = 0.5f * (s1->getPosition() + s2->getPosition());
+		
+		float KEpreCollision = s1->getKineticEnergy() + s2->getKineticEnergy();
+
+		s1->resolveCollision(s2, contact);
+
+		float KEpostCollision = s1->getKineticEnergy() + s2->getKineticEnergy();
+		float KEdelta = KEpostCollision - KEpreCollision;
+
+		if (KEdelta < -0.01f || KEdelta > 0.01f)
 		{
-			// Restitution of intersected postions after colliding
-			float intersectLength = (sqrtf(radii2) - sqrtf(mag2));
-			glm::vec2 collisionNormal = glm::normalize(s2->getPosition() - s1->getPosition());
-			float totalMass = s1->getMass() + s2->getMass();
-
-			s1->setPosition(s1->getPosition() - (((1 - (s1->getMass()) / totalMass)) * intersectLength) * collisionNormal);
-			s2->setPosition(s2->getPosition() + (((1 - (s2->getMass()) / totalMass)) * intersectLength) * collisionNormal);
-
-			glm::vec2 contact = 0.5f * (s1->getPosition(), s2->getPosition());
-
-			s1->resolveCollision(s2, contact);
-
-			return true;
+			std::cout << "Sphere-Sphere Energy Change Detected" << std::endl;
 		}
+
+		return true;
 	}
 
 	return false;
@@ -372,25 +388,24 @@ bool PhysicsScene::boxToBox(PhysicsObject * obj1, PhysicsObject * obj2)
 	Box* b2 = dynamic_cast<Box*>(obj2);
 	assert(b1 != nullptr && b2 != nullptr);
 
-	float b1_xMax = b1->getPosition().x + b1->getExtents().x;
-	float b1_xMin = b1->getPosition().x - b1->getExtents().x;
-	float b1_yMax = b1->getPosition().y + b1->getExtents().y;
-	float b1_yMin = b1->getPosition().y - b1->getExtents().y;
-	float b2_xMax = b2->getPosition().x + b2->getExtents().x;
-	float b2_xMin = b2->getPosition().x - b2->getExtents().x;
-	float b2_yMax = b2->getPosition().y + b2->getExtents().y;
-	float b2_yMin = b2->getPosition().y - b2->getExtents().y;
+	glm::vec2 boxPos = b2->getPosition() - b1->getPosition();
+	glm::vec2 norm(0, 0);
+	glm::vec2 contact(0, 0);
+	float pen = 0;
+	int numContacts = 0;
 
-	if (b1_xMax < b2_xMin || b2_xMax < b1_xMin ||
-		b1_yMax < b2_yMin || b2_yMax < b1_yMin)
+	b1->checkBoxCorners(*b2, contact, numContacts, pen, norm);
+
+	if (b2->checkBoxCorners(*b1, contact, numContacts, pen, norm)) 
 	{
-		return false;
+		norm = -norm;
 	}
-	else
-	{
-		b1->setVelocity(glm::vec2(0, 0));
-		b2->setVelocity(glm::vec2(0, 0));
 
+	if (pen > 0) 
+	{
+		b1->resolveCollision(b2, contact / float(numContacts), &norm);
 		return true;
 	}
+
+	return false;
 }

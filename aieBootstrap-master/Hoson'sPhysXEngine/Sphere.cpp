@@ -7,10 +7,10 @@ Sphere::Sphere(glm::vec2 position, glm::vec2 velocity, float mass, float radius,
 	m_Radius = radius;
 	m_Colour = colour;
 
-	m_Moment = 0.5f * m_Mass * m_Radius * m_Radius;
+	m_Moment = (2.0f / 5.0f) * m_Mass * powf(m_Radius, 2);
 }
 
-void Sphere::makeGizmo() const
+void Sphere::makeGizmo()
 {
 	glm::vec2 end = glm::vec2(std::cos(m_Rotation), std::sin(m_Rotation)) * m_Radius;
 

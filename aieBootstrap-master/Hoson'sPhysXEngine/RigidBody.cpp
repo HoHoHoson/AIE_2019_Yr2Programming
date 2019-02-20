@@ -1,3 +1,4 @@
+#include <iostream>
 #include "RigidBody.h"
 
 #define MIN_LINEAR_THRESEHOLD 0.1
@@ -22,10 +23,18 @@ RigidBody::~RigidBody()
 
 }
 
-void RigidBody::applyForce(glm::vec2 force, glm::vec2 contactPos)
+void RigidBody::applyForce(glm::vec2 force, glm::vec2 momentArm)
 {
 	m_Velocity += force / m_Mass;
-	m_AngularVelocity += (force.y * contactPos.x - force.x * contactPos.y) / m_Moment;
+
+	//glm::vec2 parallelComp = momentArm * (glm::dot(force, momentArm) / dot(momentArm, momentArm));
+	//glm::vec2 angForce = force - parallelComp;
+	//float armLength = sqrt(powf(momentArm.x, 2) + powf(momentArm.y, 2));
+
+	//angForce *= armLength;
+	//float moe = sqrt(powf(angForce.x, 2) + powf(angForce.y, 2));
+
+	m_AngularVelocity += (force.y * momentArm.x - force.x * momentArm.y) / (m_Moment);
 }
 
 void RigidBody::fixedUpdate(glm::vec2 gravity, float timeStep)
@@ -47,7 +56,10 @@ void RigidBody::fixedUpdate(glm::vec2 gravity, float timeStep)
 		angVel *= -1;
 
 	if (angVel < MIN_ROTATION_THRESEHOLD)
+	{
 		m_AngularVelocity = 0;
+		std::cout << "AV RESET" << std::endl;
+	}
 }
 
 void RigidBody::resolveCollision(RigidBody* other, glm::vec2 contact, glm::vec2* collsionNormal)
@@ -75,4 +87,10 @@ void RigidBody::resolveCollision(RigidBody* other, glm::vec2 contact, glm::vec2*
 		applyForce(-force, contact - m_Position);
 		other->applyForce(force, contact - other->m_Position);
 	}
+}
+
+float RigidBody::getKineticEnergy() const
+{
+	return 0.5f * (m_Mass*glm::dot(m_Velocity, m_Velocity) +
+		m_Moment * m_AngularVelocity * m_AngularVelocity);
 }

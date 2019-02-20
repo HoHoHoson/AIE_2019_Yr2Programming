@@ -8,7 +8,7 @@
 	 Sphere(glm::vec2 position, glm::vec2 velocity, float mass, float radius, float drag, float angularDrag, glm::vec4 colour, float elasticity = 1);
 	 ~Sphere() {}
 
-	 void makeGizmo() const;
+	 void makeGizmo();
 
 	 float getRadius()		const { return m_Radius; }
 	 glm::vec4 getColour()	const { return m_Colour; }

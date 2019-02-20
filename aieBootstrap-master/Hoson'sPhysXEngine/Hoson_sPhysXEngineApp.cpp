@@ -33,11 +33,11 @@ bool Hoson_sPhysXEngineApp::startup()
 	m_PhysicsScene->setScreenDimensions(getWindowWidth(), getWindowHeight());
 	m_PhysicsScene->setGravity(glm::vec2(0, -10));
 
-	Sphere* spaceCore1 = new Sphere(glm::vec2(0, 20), glm::vec2(0, -5), 10, 10, 0, 0, glm::vec4(1, 0, 0, 1), 0.5f);
+	Sphere* spaceCore1 = new Sphere(glm::vec2(0, 20), glm::vec2(0, -5), 1.0f, 10, 0, 0, glm::vec4(1, 0, 0, 1), 1.0f);
 	m_PhysicsScene->addActor(spaceCore1);
-	//Sphere* spaceCore2 = new Sphere(glm::vec2(20, 0), glm::vec2(0, -5), 1.0f, 10, 0, 0, glm::vec4(0, 1, 0, 1), 1.0f);
-	//m_PhysicsScene->addActor(spaceCore2);
-	//Sphere* spaceCore3 = new Sphere(glm::vec2(-20, 0), glm::vec2(0, -5), 1.0f, 10, 0, 0, glm::vec4(0, 0, 1, 1), 1.0f);
+	Sphere* spaceCore2 = new Sphere(glm::vec2(20, 0), glm::vec2(0, -5), 1.0f, 10, 0, 0, glm::vec4(0, 1, 0, 1), 1.0f);
+	m_PhysicsScene->addActor(spaceCore2);
+	//Sphere* spaceCore3 = new Sphere(glm::vec2(69, -12), glm::vec2(0, 0), 1.0f, 1, 0, 0, glm::vec4(0, 0, 1, 1), 1.0f);
 	//m_PhysicsScene->addActor(spaceCore3);
 
 	Plane* plane1 = new Plane(glm::vec2(1, 10), 50);
@@ -48,8 +48,8 @@ bool Hoson_sPhysXEngineApp::startup()
 	m_PhysicsScene->addActor(plane3);
 	Plane* plane4 = new Plane(glm::vec2(10, 1), -90);
 	m_PhysicsScene->addActor(plane4);
-	//Box* companionCube = new Box(glm::vec2(0, 40), glm::vec2(0, -10), 1, glm::vec2(100, 5), glm::vec4(0, 1, 0, 1));
-	//m_PhysicsScene->addActor(companionCube);
+	Box* companionCube = new Box(glm::vec2(0, 40), glm::vec2(0, -1), 1.0f, glm::vec2(4, 4), 0, 0, glm::vec4(0, 0, 1, 1));
+	m_PhysicsScene->addActor(companionCube);
 
 	/// ROCKET POWA
 	//player = new Sphere(glm::vec2(0, 0), glm::vec2(0, 0), 10.0f, 5, glm::vec4(1, 1, 1, 1));
@@ -139,8 +139,8 @@ void Hoson_sPhysXEngineApp::projectileArcDemo(glm::vec2 startPos, float inclinat
 	float tStep = 0.5f;
 	float radius = 1.0f;
 	int segments = 12;
-	float xSpeed = cosf(inclination / 180 * M_PI) * speed;
-	float ySpeed = sinf(inclination / 180 * M_PI) * speed;
+	float xSpeed = (float)cosf(inclination / 180 * M_PI) * speed;
+	float ySpeed = (float)sinf(inclination / 180 * M_PI) * speed;
 	glm::vec2 pos = startPos;
 	glm::vec4 colour(1, 1, 0, 1);
 

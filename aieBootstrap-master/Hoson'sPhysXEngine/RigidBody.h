@@ -10,15 +10,17 @@ public:
 	virtual void debug() {};
 	void applyForce(glm::vec2 force, glm::vec2 position);
 
-	glm::vec2 getPosition()const { return m_Position; }
-	glm::vec2 getVelocity()const { return m_Velocity; }
-	float getRotation()const { return m_Rotation; }
-	float getMass()const { return m_Mass; }
-	float getLinearDrag()const { return m_LinearDrag; }
-	float getAngularDrag()const { return m_AngularDrag; }
-	float getElasticity()const { return m_Elasticity; }
-	float getAngularVelocity()const { return m_AngularVelocity; }
-	float getMoment()const { return m_Moment; }
+	glm::vec2 getPosition()		const { return m_Position; }
+	glm::vec2 getVelocity()		const { return m_Velocity; }
+	float getRotation()			const { return m_Rotation; }
+	float getMass()				const { return m_Mass; }
+	float getLinearDrag()		const { return m_LinearDrag; }
+	float getAngularDrag()		const { return m_AngularDrag; }
+	float getElasticity()		const { return m_Elasticity; }
+	float getAngularVelocity()	const { return m_AngularVelocity; }
+	float getMoment()			const { return m_Moment; }
+	float getKineticEnergy()	const;
+
 
 	void setPosition(glm::vec2 newPos) { m_Position = newPos; }
 	void setVelocity(glm::vec2 newVel) { m_Velocity = newVel; }
