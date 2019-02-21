@@ -16,7 +16,7 @@ public:
 	glm::vec2 getLocalX()	const { return m_LocalX; }
 	glm::vec2 getLocalY()	const { return m_LocalY; }
 
-	bool checkBoxCorners(const Box& box, glm::vec2& contact, int& numContacts, float& pen, glm::vec2& edgeNormal);
+	bool checkBoxCorners(const Box& box, glm::vec2& contact, int& numContacts, glm::vec2& edgeNormal, glm::vec2& contactForce);
 
 protected:
 

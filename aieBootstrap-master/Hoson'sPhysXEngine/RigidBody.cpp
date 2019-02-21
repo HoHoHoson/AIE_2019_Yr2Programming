@@ -58,14 +58,13 @@ void RigidBody::fixedUpdate(glm::vec2 gravity, float timeStep)
 	if (angVel < MIN_ROTATION_THRESEHOLD)
 	{
 		m_AngularVelocity = 0;
-		std::cout << "AV RESET" << std::endl;
 	}
 }
 
-void RigidBody::resolveCollision(RigidBody* other, glm::vec2 contact, glm::vec2* collsionNormal)
+void RigidBody::resolveCollision(RigidBody* other, glm::vec2 contact, glm::vec2* collisionNormal)
 {
 	// Collision Normal
-	glm::vec2 normal = glm::normalize(other->getPosition() - m_Position);
+	glm::vec2 normal = glm::normalize(collisionNormal ? *collisionNormal : other->getPosition() - m_Position);
 	glm::vec2 relativeVel = other->getVelocity() - m_Velocity;
 
 	glm::vec2 perp(normal.y, -normal.x);

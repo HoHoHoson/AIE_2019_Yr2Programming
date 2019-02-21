@@ -33,22 +33,24 @@ bool Hoson_sPhysXEngineApp::startup()
 	m_PhysicsScene->setScreenDimensions(getWindowWidth(), getWindowHeight());
 	m_PhysicsScene->setGravity(glm::vec2(0, -10));
 
-	Sphere* spaceCore1 = new Sphere(glm::vec2(0, 20), glm::vec2(0, -5), 1.0f, 10, 0, 0, glm::vec4(1, 0, 0, 1), 1.0f);
-	m_PhysicsScene->addActor(spaceCore1);
-	Sphere* spaceCore2 = new Sphere(glm::vec2(20, 0), glm::vec2(0, -5), 1.0f, 10, 0, 0, glm::vec4(0, 1, 0, 1), 1.0f);
-	m_PhysicsScene->addActor(spaceCore2);
+	//Sphere* spaceCore1 = new Sphere(glm::vec2(-40, 5), glm::vec2(10, 0), 1.0f, 10, 0, 0, glm::vec4(1, 0, 0, 1), 0.5f);
+	//m_PhysicsScene->addActor(spaceCore1);
+	//Sphere* spaceCore2 = new Sphere(glm::vec2(20, 0), glm::vec2(0, -5), 1.0f, 10, 0, 0, glm::vec4(0, 1, 0, 1), 0.5f);
+	//m_PhysicsScene->addActor(spaceCore2);
 	//Sphere* spaceCore3 = new Sphere(glm::vec2(69, -12), glm::vec2(0, 0), 1.0f, 1, 0, 0, glm::vec4(0, 0, 1, 1), 1.0f);
 	//m_PhysicsScene->addActor(spaceCore3);
 
 	Plane* plane1 = new Plane(glm::vec2(1, 10), 50);
 	m_PhysicsScene->addActor(plane1);
-	Plane* plane2 = new Plane(glm::vec2(1, 10), -50);
+	Plane* plane2 = new Plane(glm::vec2(0, 1), -50);
 	m_PhysicsScene->addActor(plane2);
 	Plane* plane3 = new Plane(glm::vec2(10, 1), 90);
 	m_PhysicsScene->addActor(plane3);
 	Plane* plane4 = new Plane(glm::vec2(10, 1), -90);
 	m_PhysicsScene->addActor(plane4);
-	Box* companionCube = new Box(glm::vec2(0, 40), glm::vec2(0, -1), 1.0f, glm::vec2(4, 4), 0, 0, glm::vec4(0, 0, 1, 1));
+	Box* companionCube2 = new Box(glm::vec2(0, 20), glm::vec2(0, -1), 1.0f, glm::vec2(4, 4), 0, 0, glm::vec4(1, 0, 1, 1), 0.5f);
+	m_PhysicsScene->addActor(companionCube2);
+	Box* companionCube = new Box(glm::vec2(0, 0), glm::vec2(0, -1), 1.0f, glm::vec2(4, 4), 0, 0, glm::vec4(0, 1, 1, 1), 0.5f);
 	m_PhysicsScene->addActor(companionCube);
 
 	/// ROCKET POWA
@@ -75,30 +77,6 @@ void Hoson_sPhysXEngineApp::update(float deltaTime) {
 
 	// input example
 	aie::Input* input = aie::Input::getInstance();
-
-	//
-	//// ROCKET POWA ////
-	//rocketPropellant += deltaTime;
-
-	//if (player->getMass() < 0)
-	//{
-	//    	player->setMass(1.0f);
-	//}
-
- // 	if (player->getMass() > 1.0f && input->isKeyDown(aie::INPUT_KEY_SPACE) && rocketPropellant > fuelRate)
-	//{
-	//	float decreaseMass = player->getMass() - fuelWeight;
-	//	player->setMass(decreaseMass);         
-
-	//	Sphere *gas;
- //  		gas = new Sphere(player->getPosition(), glm::vec2(0, fuelVelocity), fuelWeight, 1, glm::vec4(0, 0, 1, 1)); 
-	//	gas->applyForceToActor(player, gas->getMass() * gas->getVelocity());
-	//	m_PhysicsScene->addActor(gas);
-
-	//	rocketPropellant = 0;
-	//}
-	//// ROCKET POWA ////
-	//
 
 	// Gizmos are cleared and created each frame to simulate movement of ingame objects
 	aie::Gizmos::clear();
