@@ -43,7 +43,7 @@ bool Box::checkBoxCorners(const Box& box, glm::vec2 & contact, int & numContacts
 			float w2 = m_Extents.x;
 			float h2 = m_Extents.y;
 
-			if (p0.y < h2 && p0.y > -h2)
+			if (p0.y <= h2 && p0.y >= -h2)
 			{
 				if (p0.x > 0 && p0.x < w2)
 				{
@@ -61,7 +61,7 @@ bool Box::checkBoxCorners(const Box& box, glm::vec2 & contact, int & numContacts
 				}
 			}
 
-			if (p0.x < w2 && p0.x > -w2)
+			if (p0.x <= w2 && p0.x >= -w2)
 			{
 				if (p0.y > 0 && p0.y < h2)
 				{

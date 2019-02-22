@@ -33,8 +33,8 @@ bool Hoson_sPhysXEngineApp::startup()
 	m_PhysicsScene->setScreenDimensions(getWindowWidth(), getWindowHeight());
 	m_PhysicsScene->setGravity(glm::vec2(0, -10));
 
-	//Sphere* spaceCore1 = new Sphere(glm::vec2(-40, 5), glm::vec2(10, 0), 1.0f, 10, 0, 0, glm::vec4(1, 0, 0, 1), 0.5f);
-	//m_PhysicsScene->addActor(spaceCore1);
+	Sphere* spaceCore1 = new Sphere(glm::vec2(0, 40), glm::vec2(0, -1), 10.0f, 10, 0, 0, glm::vec4(1, 0, 0, 1));
+	m_PhysicsScene->addActor(spaceCore1);
 	//Sphere* spaceCore2 = new Sphere(glm::vec2(20, 0), glm::vec2(0, -5), 1.0f, 10, 0, 0, glm::vec4(0, 1, 0, 1), 0.5f);
 	//m_PhysicsScene->addActor(spaceCore2);
 	//Sphere* spaceCore3 = new Sphere(glm::vec2(69, -12), glm::vec2(0, 0), 1.0f, 1, 0, 0, glm::vec4(0, 0, 1, 1), 1.0f);
@@ -48,10 +48,12 @@ bool Hoson_sPhysXEngineApp::startup()
 	m_PhysicsScene->addActor(plane3);
 	Plane* plane4 = new Plane(glm::vec2(10, 1), -90);
 	m_PhysicsScene->addActor(plane4);
-	Box* companionCube2 = new Box(glm::vec2(0, 20), glm::vec2(0, -1), 1.0f, glm::vec2(4, 4), 0, 0, glm::vec4(1, 0, 1, 1), 0.5f);
-	m_PhysicsScene->addActor(companionCube2);
-	Box* companionCube = new Box(glm::vec2(0, 0), glm::vec2(0, -1), 1.0f, glm::vec2(4, 4), 0, 0, glm::vec4(0, 1, 1, 1), 0.5f);
+	Box* companionCube = new Box(glm::vec2(0, 0), glm::vec2(0, -1), 1.0f, glm::vec2(4, 4), 0, 0, glm::vec4(0, 1, 1, 1));
 	m_PhysicsScene->addActor(companionCube);
+	//Box* companionCube2 = new Box(glm::vec2(0, 40), glm::vec2(0, -1), 1.0f, glm::vec2(4, 4), 0, 0, glm::vec4(1, 0, 1, 1));
+	//m_PhysicsScene->addActor(companionCube2);
+	//Box* companionCube3 = new Box(glm::vec2(0, 20), glm::vec2(0, -1), 1.0f, glm::vec2(4, 4), 0, 0, glm::vec4(1, 1, 1, 1), 0.5f);
+	//m_PhysicsScene->addActor(companionCube3);
 
 	/// ROCKET POWA
 	//player = new Sphere(glm::vec2(0, 0), glm::vec2(0, 0), 10.0f, 5, glm::vec4(1, 1, 1, 1));

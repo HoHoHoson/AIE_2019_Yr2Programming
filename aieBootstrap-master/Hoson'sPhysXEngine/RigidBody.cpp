@@ -46,19 +46,19 @@ void RigidBody::fixedUpdate(glm::vec2 gravity, float timeStep)
 	m_Rotation += m_AngularVelocity * timeStep;
 	m_AngularVelocity -= m_AngularVelocity * m_AngularDrag * timeStep;
 
-	if ((powf(m_Velocity.x, 2) + powf(m_Velocity.y, 2)) < powf(MIN_LINEAR_THRESEHOLD, 2))
-	{
-		m_Velocity = glm::vec2(0, 0);
-	}
+	//if ((powf(m_Velocity.x, 2) + powf(m_Velocity.y, 2)) < powf(MIN_LINEAR_THRESEHOLD, 2))
+	//{
+	//	m_Velocity = glm::vec2(0, 0);
+	//}
 
-	float angVel = m_AngularVelocity;
-	if (angVel < 0)
-		angVel *= -1;
+	//float angVel = m_AngularVelocity;
+	//if (angVel < 0)
+	//	angVel *= -1;
 
-	if (angVel < MIN_ROTATION_THRESEHOLD)
-	{
-		m_AngularVelocity = 0;
-	}
+	//if (angVel < MIN_ROTATION_THRESEHOLD)
+	//{
+	//	m_AngularVelocity = 0;
+	//}
 }
 
 void RigidBody::resolveCollision(RigidBody* other, glm::vec2 contact, glm::vec2* collisionNormal)
@@ -74,7 +74,7 @@ void RigidBody::resolveCollision(RigidBody* other, glm::vec2 contact, glm::vec2*
 	float v1 = glm::dot(m_Velocity, normal) - r1 * m_AngularVelocity;
 	float v2 = glm::dot(other->m_Velocity, normal) + r2 * other->m_AngularVelocity;
 
-	if (v1 > v2)
+	//if (v1 > v2)
 	{
 		float mass1 = 1.0f / (1.0f / m_Mass + (r1 * r1) / m_Moment);
 		float mass2 = 1.0f / (1.0f / other->m_Mass + (r2 * r2) / other->m_Moment);
