@@ -5,7 +5,7 @@
 #include "PhysicsScene.h"
 #include "Sphere.h"
 #include "Plane.h"
-#include "Box.h"
+#include "Shape.h"
 #include <Gizmos.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -33,12 +33,8 @@ bool Hoson_sPhysXEngineApp::startup()
 	m_PhysicsScene->setScreenDimensions(getWindowWidth(), getWindowHeight());
 	m_PhysicsScene->setGravity(glm::vec2(0, -10));
 
-	Sphere* spaceCore1 = new Sphere(glm::vec2(0, 40), glm::vec2(0, -1), 10.0f, 10, 0, 0, glm::vec4(1, 0, 0, 1));
-	m_PhysicsScene->addActor(spaceCore1);
-	//Sphere* spaceCore2 = new Sphere(glm::vec2(20, 0), glm::vec2(0, -5), 1.0f, 10, 0, 0, glm::vec4(0, 1, 0, 1), 0.5f);
-	//m_PhysicsScene->addActor(spaceCore2);
-	//Sphere* spaceCore3 = new Sphere(glm::vec2(69, -12), glm::vec2(0, 0), 1.0f, 1, 0, 0, glm::vec4(0, 0, 1, 1), 1.0f);
-	//m_PhysicsScene->addActor(spaceCore3);
+	Sphere* sphere1 = new Sphere(glm::vec2(0, 0), glm::vec2(0, -1), 1.0f, 10, 0, glm::vec4(1, 0, 0, 1), 1.1f);
+	m_PhysicsScene->addActor(sphere1);
 
 	Plane* plane1 = new Plane(glm::vec2(1, 10), 50);
 	m_PhysicsScene->addActor(plane1);
@@ -48,23 +44,6 @@ bool Hoson_sPhysXEngineApp::startup()
 	m_PhysicsScene->addActor(plane3);
 	Plane* plane4 = new Plane(glm::vec2(10, 1), -90);
 	m_PhysicsScene->addActor(plane4);
-	Box* companionCube = new Box(glm::vec2(0, 0), glm::vec2(0, -1), 1.0f, glm::vec2(4, 4), 0, 0, glm::vec4(0, 1, 1, 1));
-	m_PhysicsScene->addActor(companionCube);
-	//Box* companionCube2 = new Box(glm::vec2(0, 40), glm::vec2(0, -1), 1.0f, glm::vec2(4, 4), 0, 0, glm::vec4(1, 0, 1, 1));
-	//m_PhysicsScene->addActor(companionCube2);
-	//Box* companionCube3 = new Box(glm::vec2(0, 20), glm::vec2(0, -1), 1.0f, glm::vec2(4, 4), 0, 0, glm::vec4(1, 1, 1, 1), 0.5f);
-	//m_PhysicsScene->addActor(companionCube3);
-
-	/// ROCKET POWA
-	//player = new Sphere(glm::vec2(0, 0), glm::vec2(0, 0), 10.0f, 5, glm::vec4(1, 1, 1, 1));
-	//m_PhysicsScene->addActor(player);
-
-	/// Code below is for the projectiles demo
-	//float xSpeed = cosf(45.0f / 180 * M_PI) * 35;
-	//float ySpeed = sinf(45.0f / 180 * M_PI) * 35;
-	//Sphere* testProjectile = new Sphere(glm::vec2(-40, 0), glm::vec2(xSpeed, ySpeed), 1, 1, glm::vec4(1, 1, 1, 1));
-	//m_PhysicsScene->addActor(testProjectile);
-	//projectileArcDemo(glm::vec2(-40, 0), 45, 35, -10);
 
 	return true;
 }
@@ -112,25 +91,3 @@ void Hoson_sPhysXEngineApp::draw() {
 	// done drawing sprites
 	m_2dRenderer->end();
 }
-
-void Hoson_sPhysXEngineApp::projectileArcDemo(glm::vec2 startPos, float inclination, float speed, float gravity)
-{
-	float t = 0;
-	float tStep = 0.5f;
-	float radius = 1.0f;
-	int segments = 12;
-	float xSpeed = (float)cosf(inclination / 180 * M_PI) * speed;
-	float ySpeed = (float)sinf(inclination / 180 * M_PI) * speed;
-	glm::vec2 pos = startPos;
-	glm::vec4 colour(1, 1, 0, 1);
-
-	while (t <= 5)
-	{
-		pos.x = startPos.x + xSpeed * t;
-		pos.y = startPos.y + ySpeed * t + 0.5 * gravity * powf(t, 2);
-
-		aie::Gizmos::add2DCircle(pos, radius, segments, colour);
-		t += tStep;
-	}
-}
-

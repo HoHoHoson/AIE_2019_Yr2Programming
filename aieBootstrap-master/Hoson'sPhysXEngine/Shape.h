@@ -1,14 +1,14 @@
 #pragma once
 #include "RigidBody.h"
 
-class Box : public RigidBody
+class Shape : public RigidBody
 {
 public:
-	Box(glm::vec2 pos, glm::vec2 vel, float mass, glm::vec2 extents, float drag, float angularDrag, glm::vec4 colour, float elasticity = 1);
-	~Box() {}
+	Shape(glm::vec2 pos, glm::vec2 vel, float mass, glm::vec2 extents, float drag, glm::vec4 colour, float elasticity = 1);
+	~Shape() {}
 
 	void makeGizmo();
-	void fixedUpdate(glm::vec2 gravity, float timeStep);
+	//void fixedUpdate(glm::vec2 gravity, float timeStep);
 	void debug() {}
 
 	glm::vec2 getExtents()	const { return m_Extents; }
@@ -16,7 +16,7 @@ public:
 	glm::vec2 getLocalX()	const { return m_LocalX; }
 	glm::vec2 getLocalY()	const { return m_LocalY; }
 
-	bool checkBoxCorners(const Box& box, glm::vec2& contact, int& numContacts, glm::vec2& edgeNormal, glm::vec2& contactForce);
+	bool checkBoxCorners(const Shape& box, glm::vec2& contact, int& numContacts, glm::vec2& edgeNormal, glm::vec2& contactForce);
 
 protected:
 

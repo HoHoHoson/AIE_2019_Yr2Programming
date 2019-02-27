@@ -5,7 +5,7 @@
  {
  public:
 
-	 Sphere(glm::vec2 position, glm::vec2 velocity, float mass, float radius, float drag, float angularDrag, glm::vec4 colour, float elasticity = 1);
+	 Sphere(glm::vec2 position, glm::vec2 velocity, float mass, float radius, float drag, glm::vec4 colour, float elasticity = 1);
 	 ~Sphere() {}
 
 	 void makeGizmo();

@@ -163,7 +163,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Hoson%27sPhysXEngine\Box.cpp" />
+    <ClCompile Include="Shape.cpp" />
     <ClCompile Include="..\Hoson%27sPhysXEngine\PhysicsScene.cpp" />
     <ClCompile Include="..\Hoson%27sPhysXEngine\Plane.cpp" />
     <ClCompile Include="..\Hoson%27sPhysXEngine\RigidBody.cpp" />
@@ -172,7 +172,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Hoson%27sPhysXEngine\Box.h" />
+    <ClInclude Include="Shape.h" />
     <ClInclude Include="..\Hoson%27sPhysXEngine\PhysicsObject.h" />
     <ClInclude Include="..\Hoson%27sPhysXEngine\PhysicsScene.h" />
     <ClInclude Include="..\Hoson%27sPhysXEngine\Plane.h" />

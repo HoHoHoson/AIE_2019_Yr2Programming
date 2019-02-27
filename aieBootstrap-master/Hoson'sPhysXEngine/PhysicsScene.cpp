@@ -6,12 +6,11 @@
 #include <iostream>
 #include "Sphere.h"
 #include "Plane.h"
-#include "Box.h"
+#include "Shape.h"
 
 // This constructir has an initialisation list. It can call a base class constructor and/or be used to initialise const and normal variables.
 PhysicsScene::PhysicsScene(): m_timeStep(0.01f), m_gravity(glm::vec2(0, 0))
 {
-	// Adjusted timestep from 0.01f to 0.5f for projectiles demo
 }
 
 PhysicsScene::~PhysicsScene()
@@ -53,9 +52,6 @@ void PhysicsScene::update(float deltaTime)
 				else
 					++itCheck;
 			}
-
-			// Projectiles Demo
-			//updateGizmos();
 		}
 
 		if (m_actors.empty())
@@ -172,17 +168,7 @@ bool PhysicsScene::planeToSphere(PhysicsObject * obj1, PhysicsObject * obj2)
 		glm::vec2 planeIntersect = s->getPosition() - (planeNormal * dis);
 		s->setPosition(planeIntersect + planeNormal * s->getRadius());
 
-		float KEpreCollision = s->getKineticEnergy();
-
-		p->resolveCollision(planeNormal, s, planeIntersect);
-
-		float KEpostCollision = s->getKineticEnergy();
-		float KEdelta = KEpostCollision - KEpreCollision;
-
-		if (KEdelta < -0.01f || KEdelta > 0.01f)
-		{
-			std::cout << "Plane-Sphere Energy Change Detected" << std::endl;
-		}
+		p->resolveCollision(planeNormal, s);
 
 		return true;
 	}
@@ -192,78 +178,6 @@ bool PhysicsScene::planeToSphere(PhysicsObject * obj1, PhysicsObject * obj2)
 
 bool PhysicsScene::planeToBox(PhysicsObject * obj1, PhysicsObject * obj2)
 {
-	Plane* p = dynamic_cast<Plane*>(obj1);
-	Box* b = dynamic_cast<Box*>(obj2);
-	assert(p != nullptr && b != nullptr);
-
-	int numContacts = 0;
-	glm::vec2 contact(0, 0);
-	float contactV = 0;
-	float radius = std::fminf(b->getExtents().x, b->getExtents().y);
-	float penetration = 0;
-
-	glm::vec2 planeOrigin = p->getNormal() * p->getDistance();
-	float comFromPlane = glm::dot(b->getPosition() - planeOrigin, p->getNormal());
-
-	for (float x = -b->getExtents().x; x < (b->getExtents().x * 2); x += (b->getExtents().x * 2))
-	{
-		for (float y = -b->getExtents().y; y < (b->getExtents().y * 2); y += (b->getExtents().y * 2))
-		{
-			glm::vec2 bCorner = b->getPosition() + x * b->getLocalX() + y * b->getLocalY();
-
-			float distFromPlane = glm::dot(bCorner - planeOrigin, p->getNormal());
-
-			float velocityIntoPlane = glm::dot(b->getVelocity() + b->getAngularVelocity() * (-y * b->getLocalX() + x * b->getLocalY()), p->getNormal());
-
-			if ((distFromPlane > 0 && comFromPlane < 0 && velocityIntoPlane >= 0) ||
-				(distFromPlane < 0 && comFromPlane > 0 && velocityIntoPlane <= 0))
-			{
-				numContacts++;
-				contact += bCorner;
-				contactV += velocityIntoPlane;
-
-				if (comFromPlane >= 0)
-				{
-					if (penetration > distFromPlane)
-					{
-						penetration = distFromPlane;
-					}
-				}
-				else if (penetration < distFromPlane)
-				{
-					penetration = distFromPlane;
-				}
-			}
-		}
-	}
-
-	if (numContacts > 0)
-	{
-		float collisionV = contactV / (float)numContacts;
-
-		glm::vec2 acceleration = -p->getNormal() * ((1.0f + b->getElasticity()) * collisionV);
-
-		glm::vec2 localContact = (contact / (float)numContacts) - b->getPosition();
-		float r = glm::dot(localContact, glm::vec2(p->getNormal().y, -p->getNormal().x));
-
-		float mass0 = 1.0f / (1.0f / b->getMass() + (r * r) / b->getMoment());
-
-		float KEpreCollision = b->getKineticEnergy();
-
-		b->applyForce(acceleration * mass0, localContact);
-
-		float KEpostCollision = b->getKineticEnergy();
-		float KEdelta = KEpostCollision - KEpreCollision;
-		if (KEdelta < -0.01f || KEdelta > 0.01f)
-		{
-			std::cout << "Plane-Box Energy Change Detected" << std::endl;
-		}
-
-		b->setPosition(b->getPosition() - p->getNormal() * penetration);
-
-		return true;
-	}
-
 	return false;
 }
 
@@ -295,18 +209,8 @@ bool PhysicsScene::sphereToSphere(PhysicsObject* obj1, PhysicsObject* obj2)
 		s2->setPosition(s2->getPosition() + (((1 - (s2->getMass()) / totalMass)) * intersectLength) * collisionNormal);
 
 		glm::vec2 contact = 0.5f * (s1->getPosition() + s2->getPosition());
-		
-		float KEpreCollision = s1->getKineticEnergy() + s2->getKineticEnergy();
 
-		s1->resolveCollision(s2, contact);
-
-		float KEpostCollision = s1->getKineticEnergy() + s2->getKineticEnergy();
-		float KEdelta = KEpostCollision - KEpreCollision;
-
-		if (KEdelta < -0.01f || KEdelta > 0.01f)
-		{
-			std::cout << "Sphere-Sphere Energy Change Detected" << std::endl;
-		}
+		s1->resolveCollision(s2);
 
 		return true;
 	}
@@ -316,89 +220,6 @@ bool PhysicsScene::sphereToSphere(PhysicsObject* obj1, PhysicsObject* obj2)
 
 bool PhysicsScene::sphereToBox(PhysicsObject * obj1, PhysicsObject * obj2)
 {
-	Sphere* s = dynamic_cast<Sphere*>(obj1);
-	Box* b = dynamic_cast<Box*>(obj2);
-	assert(s != nullptr && b != nullptr);
-
-	glm::vec2 displacement = s->getPosition() - b->getPosition();
-	float w2 = b->getExtents().x;
-	float h2 = b->getExtents().y;
-
-	int numContacts = 0;
-	glm::vec2 contact(0, 0);
-
-	for (float x = -w2; x <= w2; x += (b->getExtents().x * 2))
-	{
-		for (float y = -h2; y <= h2; y += (b->getExtents().y * 2))
-		{
-			glm::vec2 bCorner = x * b->getLocalX() + y * b->getLocalY();
-			glm::vec2 dp = bCorner - displacement;
-
-			if (dp.x * dp.x + dp.y * dp.y < s->getRadius() * s->getRadius())
-			{
-				numContacts++;
-				contact += glm::vec2(x, y);
-			}
-		}
-	}
-
-	glm::vec2* direction = nullptr;
-	glm::vec2 localPos(glm::dot(b->getLocalX(), displacement), glm::dot(b->getLocalY(), displacement));
-
-	if (localPos.y < h2 && localPos.y > -h2)
-	{
-		if (localPos.x > 0 && localPos.x < w2 + s->getRadius())
-		{
-			numContacts++;
-			contact += glm::vec2(w2, localPos.y);
-			direction = new glm::vec2(b->getLocalX());
-		}
-
-		if (localPos.x < 0 && localPos.x > -(w2 + s->getRadius()))
-		{
-			numContacts++;
-			contact += glm::vec2(-w2, localPos.y);
-			direction = new glm::vec2(-b->getLocalX());
-		}
-	}
-
-	if (localPos.x < w2 && localPos.x > -w2)
-	{
-		if (localPos.y > 0 && localPos.y < h2 + s->getRadius())
-		{
-			numContacts++;
-			contact += glm::vec2(localPos.x, h2);
-			direction = new glm::vec2(b->getLocalY());
-		}
-
-		if (localPos.y < 0 && localPos.y > -(h2 + s->getRadius()))
-		{
-			numContacts++;
-			contact += glm::vec2(localPos.x, -h2);
-			direction = new glm::vec2(-b->getLocalY());
-		}
-	}
-
-	if (numContacts > 0)
-	{
-		contact = b->getPosition() + (1.0f / numContacts) * (b->getLocalX() * contact.x + b->getLocalY() * contact.y);
-
-		float KEpreCollision = b->getKineticEnergy() + s->getKineticEnergy();
-
-		s->resolveCollision(b, contact, direction);
-
-		float KEpostCollision = b->getKineticEnergy() + s->getKineticEnergy();
-		float KEdelta = KEpostCollision - KEpreCollision;
-		if (KEdelta < -0.01f || KEdelta > 0.01f)
-		{
-			std::cout << "Sphere-Box Energy Change Detected" << std::endl;
-		}
-
-		delete direction;
-		return true;
-	}
-
-	delete direction;
 	return false;
 }
 
@@ -418,42 +239,5 @@ bool PhysicsScene::boxToSphere(PhysicsObject * obj1, PhysicsObject * obj2)
 
 bool PhysicsScene::boxToBox(PhysicsObject * obj1, PhysicsObject * obj2)
 {
-	Box* b1 = dynamic_cast<Box*>(obj1);
-	Box* b2 = dynamic_cast<Box*>(obj2);
-	assert(b1 != nullptr && b2 != nullptr);
-
-	glm::vec2 boxPos = b2->getPosition() - b1->getPosition();
-	glm::vec2 normal(0, 0);
-	glm::vec2 contactForce1, contactForce2;
-	glm::vec2 contact(0, 0);
-	int numContacts = 0;
-
-	b1->checkBoxCorners(*b2, contact, numContacts, normal, contactForce1);
-
-	if (b2->checkBoxCorners(*b1, contact, numContacts, normal, contactForce2)) 
-	{
-		normal= -normal;
-	}
-
-	if (numContacts > 0)
-	{
-		glm::vec2 contactForce = 0.5f * (contactForce1 - contactForce2);
-		b1->setPosition(b1->getPosition() - contactForce);
-		b2->setPosition(b2->getPosition() + contactForce);
-
-		float KEpreCollision = b1->getKineticEnergy() + b2->getKineticEnergy();
-
-		b1->resolveCollision(b2, contact / float(numContacts), &normal);
-
-		float KEpostCollision = b1->getKineticEnergy() + b2->getKineticEnergy();
-		float KEdelta = KEpostCollision - KEpreCollision;
-		if (KEdelta < -0.01f || KEdelta > 0.01f)
-		{
-			std::cout << "Box-Box Energy Change Detected" << std::endl;
-		}
-
-		return true;
-	}
-
 	return false;
 }
