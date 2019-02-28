@@ -5,6 +5,7 @@
 #include "PhysicsScene.h"
 #include "Sphere.h"
 #include "Plane.h"
+#include "Box.h"
 #include "Shape.h"
 #include <Gizmos.h>
 #define _USE_MATH_DEFINES
@@ -31,18 +32,23 @@ bool Hoson_sPhysXEngineApp::startup()
 
 	m_PhysicsScene = new PhysicsScene();
 	m_PhysicsScene->setScreenDimensions(getWindowWidth(), getWindowHeight());
-	m_PhysicsScene->setGravity(glm::vec2(0, -10));
+	m_PhysicsScene->setGravity(glm::vec2(0, 0));
 
-	Sphere* sphere1 = new Sphere(glm::vec2(0, 0), glm::vec2(0, -1), 1.0f, 10, 0, glm::vec4(1, 0, 0, 1), 1.1f);
+	Sphere* sphere1 = new Sphere(glm::vec2(0, -2.5f), glm::vec2(10, 0), 1.0f, 1, 0, glm::vec4(1, 0, 0, 0));
 	m_PhysicsScene->addActor(sphere1);
 
-	Plane* plane1 = new Plane(glm::vec2(1, 10), 50);
+	Box* box1 = new Box(glm::vec2(40, 0), glm::vec2(0, 0), 1.0f, glm::vec2(5, 5), 0, glm::vec4(1, 1, 1, 1));
+	m_PhysicsScene->addActor(box1);
+	Box* box2 = new Box(glm::vec2(0, -40), glm::vec2(0, 0), 1.0f, glm::vec2(50, 5), 0, glm::vec4(0, 0, 1, 1));
+	m_PhysicsScene->addActor(box2);
+
+	Plane* plane1 = new Plane(glm::vec2(1, 10), -50);
 	m_PhysicsScene->addActor(plane1);
-	Plane* plane2 = new Plane(glm::vec2(0, 1), -50);
+	Plane* plane2 = new Plane(glm::vec2(1, -10), -50);
 	m_PhysicsScene->addActor(plane2);
-	Plane* plane3 = new Plane(glm::vec2(10, 1), 90);
+	Plane* plane3 = new Plane(glm::vec2(10, 1), -90);
 	m_PhysicsScene->addActor(plane3);
-	Plane* plane4 = new Plane(glm::vec2(10, 1), -90);
+	Plane* plane4 = new Plane(glm::vec2(-10, 1), -90);
 	m_PhysicsScene->addActor(plane4);
 
 	return true;

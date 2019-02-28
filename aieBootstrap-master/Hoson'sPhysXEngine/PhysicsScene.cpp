@@ -7,6 +7,7 @@
 #include "Sphere.h"
 #include "Plane.h"
 #include "Shape.h"
+#include "Box.h"
 
 // This constructir has an initialisation list. It can call a base class constructor and/or be used to initialise const and normal variables.
 PhysicsScene::PhysicsScene(): m_timeStep(0.01f), m_gravity(glm::vec2(0, 0))
@@ -153,22 +154,15 @@ bool PhysicsScene::planeToSphere(PhysicsObject * obj1, PhysicsObject * obj2)
 	Sphere* s = dynamic_cast<Sphere*>(obj2);
 	assert(p != nullptr && s != nullptr);
 
-	glm::vec2 planeNormal = p->getNormal();
-	float dis = glm::dot(planeNormal, s->getPosition()) - p->getDistance();
-
-	if (dis < 0)
-	{
-		planeNormal *= -1;
-		dis *= -1;
-	}
+	float dis = glm::dot(p->getNormal(), s->getPosition()) - p->getDistance();
 
 	if (dis - s->getRadius() < 0)
 	{
 		// Restitution of intersected postions after colliding
-		glm::vec2 planeIntersect = s->getPosition() - (planeNormal * dis);
-		s->setPosition(planeIntersect + planeNormal * s->getRadius());
+		glm::vec2 planeIntersect = s->getPosition() - (p->getNormal() * dis);
+		s->setPosition(planeIntersect + p->getNormal() * s->getRadius());
 
-		p->resolveCollision(planeNormal, s);
+		p->resolveCollision(s);
 
 		return true;
 	}
@@ -178,6 +172,32 @@ bool PhysicsScene::planeToSphere(PhysicsObject * obj1, PhysicsObject * obj2)
 
 bool PhysicsScene::planeToBox(PhysicsObject * obj1, PhysicsObject * obj2)
 {
+	Plane* p = dynamic_cast<Plane*>(obj1);
+	Box* b = dynamic_cast<Box*>(obj2);
+	assert(p && b);
+
+	float distanceMax = 0;
+
+	for (float x = b->getPosition().x - b->getExtents().x; x <= (b->getPosition().x + b->getExtents().x); x += (b->getExtents().x * 2))
+	{
+		for (float y = b->getPosition().y - b->getExtents().y; y <= (b->getPosition().y + b->getExtents().y); y += (b->getExtents().y * 2))
+		{
+			glm::vec2 point(x, y);
+			float distance = glm::dot(point, p->getNormal()) - p->getDistance();
+
+			if (distance < distanceMax)
+				distanceMax = distance;
+		}
+	}
+
+	if (distanceMax < 0)
+	{
+		b->setPosition(b->getPosition() + (p->getNormal() * distanceMax * -1.0f));
+		p->resolveCollision(b);
+
+		return true;
+	}
+
 	return false;
 }
 
@@ -220,6 +240,37 @@ bool PhysicsScene::sphereToSphere(PhysicsObject* obj1, PhysicsObject* obj2)
 
 bool PhysicsScene::sphereToBox(PhysicsObject * obj1, PhysicsObject * obj2)
 {
+	Sphere* s = dynamic_cast<Sphere*>(obj1);
+	Box* b = dynamic_cast<Box*>(obj2);
+	assert(s && b);
+
+	glm::vec2 contactPoint = s->getPosition();
+
+	float xMin = b->getPosition().x - b->getExtents().x;
+	float xMax = b->getPosition().x + b->getExtents().x;
+	float yMin = b->getPosition().y - b->getExtents().y;
+	float yMax = b->getPosition().y + b->getExtents().y;
+
+	if (contactPoint.x < xMin)
+		contactPoint.x = xMin;
+	else if (contactPoint.x > xMax)
+		contactPoint.x = xMax;
+
+	if (contactPoint.y < yMin)
+		contactPoint.y = yMin;
+	else if (contactPoint.y > yMax)
+		contactPoint.y = yMax;
+
+	glm::vec2 displacement = contactPoint - s->getPosition();
+	float magPow2 = (displacement.x * displacement.x) + (displacement.y * displacement.y);
+
+	if ((magPow2 - (s->getRadius() * s->getRadius())) < 0)
+	{
+		s->resolveCollision(b);
+
+		return true;
+	}
+
 	return false;
 }
 
@@ -239,5 +290,24 @@ bool PhysicsScene::boxToSphere(PhysicsObject * obj1, PhysicsObject * obj2)
 
 bool PhysicsScene::boxToBox(PhysicsObject * obj1, PhysicsObject * obj2)
 {
-	return false;
+	Box* b1 = dynamic_cast<Box*>(obj1);
+	Box* b2 = dynamic_cast<Box*>(obj2);
+	assert(b1 && b2);
+
+	float xMinb1 = b1->getPosition().x - b1->getExtents().x;
+	float xMaxb1 = b1->getPosition().x + b1->getExtents().x;
+	float yMinb1 = b1->getPosition().y - b1->getExtents().y;
+	float yMaxb1 = b1->getPosition().y + b1->getExtents().y;
+
+	float xMinb2 = b2->getPosition().x - b2->getExtents().x;
+	float xMaxb2 = b2->getPosition().x + b2->getExtents().x;
+	float yMinb2 = b2->getPosition().y - b2->getExtents().y;
+	float yMaxb2 = b2->getPosition().y + b2->getExtents().y;
+
+	if (xMinb1 > xMaxb2 || xMinb2 > xMaxb1 || yMinb1 > yMaxb2 || yMinb2 > yMaxb1)
+		return false;
+	
+	b1->resolveCollision(b2);
+
+	return true;
 }
