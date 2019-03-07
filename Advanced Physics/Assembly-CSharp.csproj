@@ -63,6 +63,8 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\CannonBall.cs" />
     <Compile Include="Assets\Scripts\PhysicsObject.cs" />
+    <Compile Include="Assets\Scripts\Ragdoll.cs" />
+    <Compile Include="Assets\Scripts\RagdollTrigger.cs" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>L:/GitKraken/AIE_2019_Yr2Programming/Advanced Physics/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
