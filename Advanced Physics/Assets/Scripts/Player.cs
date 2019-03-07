@@ -12,12 +12,16 @@ public class Player : MonoBehaviour
 
     public float speed = 80.0f;
     public float pushPower = 2.0f;
+    public Text debugDisplay = null;
 
 	// Use this for initialization
 	void Start ()
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
+
+        if (debugDisplay)
+            debugDisplay.enabled = true;
 	}
 	
 	// Update is called once per frame
@@ -29,6 +33,9 @@ public class Player : MonoBehaviour
         controller.SimpleMove(transform.up * Time.deltaTime);
         transform.Rotate(transform.up, horizontal * speed * Time.deltaTime);
         animator.SetFloat("Speed", vertical * speed * Time.deltaTime);
+
+        if (debugDisplay)
+            debugDisplay.text = Time.deltaTime.ToString();
 	}
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
