@@ -820,7 +820,6 @@ GameObject:
   - component: {fileID: 225278986}
   - component: {fileID: 225278985}
   - component: {fileID: 225278984}
-  - component: {fileID: 225278989}
   m_Layer: 0
   m_Name: CanonBall
   m_TagString: Untagged
@@ -910,18 +909,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
---- !u!114 &225278989
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 225278982}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db59ca6ca677a0540bd0847306437ce2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  forceOnFire: 6000
 --- !u!1 &292065330
 GameObject:
   m_ObjectHideFlags: 0
@@ -3327,6 +3314,7 @@ GameObject:
   - component: {fileID: 1283398109}
   - component: {fileID: 1283398108}
   - component: {fileID: 1283398107}
+  - component: {fileID: 1283398112}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -3408,6 +3396,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1283398112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1283398106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 606ba78782d4b4344afdae76bbd56f14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holdDistance: 2
+  throwForce: 50
+  pullForce: 10
+  arrivalRadius: 0.25
 --- !u!1 &1315023158
 GameObject:
   m_ObjectHideFlags: 0
@@ -4293,6 +4296,36 @@ Prefab:
     - target: {fileID: 4206730705497202, guid: e2b99bed4e993ca438237e9e504ace6e, type: 2}
       propertyPath: m_RootOrder
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 59708514225915314, guid: e2b99bed4e993ca438237e9e504ace6e,
+        type: 2}
+      propertyPath: m_Spring.spring
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 59293227706483826, guid: e2b99bed4e993ca438237e9e504ace6e,
+        type: 2}
+      propertyPath: m_Spring.spring
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 59293227706483826, guid: e2b99bed4e993ca438237e9e504ace6e,
+        type: 2}
+      propertyPath: m_UseSpring
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 59708514225915314, guid: e2b99bed4e993ca438237e9e504ace6e,
+        type: 2}
+      propertyPath: m_UseSpring
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 59708514225915314, guid: e2b99bed4e993ca438237e9e504ace6e,
+        type: 2}
+      propertyPath: m_Spring.targetPosition
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 59293227706483826, guid: e2b99bed4e993ca438237e9e504ace6e,
+        type: 2}
+      propertyPath: m_Spring.targetPosition
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e2b99bed4e993ca438237e9e504ace6e, type: 2}

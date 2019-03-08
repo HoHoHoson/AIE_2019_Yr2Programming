@@ -31,16 +31,17 @@ bool Hoson_sPhysXEngineApp::startup()
 	m_font = new aie::Font("../bin/font/consolas.ttf", 32);
 
 	m_PhysicsScene = new PhysicsScene();
-	m_PhysicsScene->setScreenDimensions(getWindowWidth(), getWindowHeight());
-	m_PhysicsScene->setGravity(glm::vec2(0, 0));
+	m_PhysicsScene->setGravity(glm::vec2(0, -10));
 
-	Sphere* sphere1 = new Sphere(glm::vec2(0, -2.5f), glm::vec2(10, 0), 1.0f, 1, 0, glm::vec4(1, 0, 0, 0));
+	m_PhysicsScene->setScreenDimensions(getWindowWidth(), getWindowHeight());
+
+	Sphere* sphere1 = new Sphere(glm::vec2(0, -2.5f), glm::vec2(10, 0), 1.0f, 5, 0, glm::vec4(1, 0, 0, 0), 1.1f);
 	m_PhysicsScene->addActor(sphere1);
 
-	Box* box1 = new Box(glm::vec2(40, 0), glm::vec2(0, 0), 1.0f, glm::vec2(5, 5), 0, glm::vec4(1, 1, 1, 1));
+	Box* box1 = new Box(glm::vec2(40, 0), glm::vec2(0, 0), 1.0f, glm::vec2(5, 5), 0, glm::vec4(1, 1, 1, 1), 1.1f);
 	m_PhysicsScene->addActor(box1);
-	Box* box2 = new Box(glm::vec2(0, -40), glm::vec2(0, 0), 1.0f, glm::vec2(50, 5), 0, glm::vec4(0, 0, 1, 1));
-	m_PhysicsScene->addActor(box2);
+	//Box* box2 = new Box(glm::vec2(0, -40), glm::vec2(0, 0), 1.0f, glm::vec2(50, 5), 0, glm::vec4(0, 0, 1, 1));
+	//m_PhysicsScene->addActor(box2);
 
 	Plane* plane1 = new Plane(glm::vec2(1, 10), -50);
 	m_PhysicsScene->addActor(plane1);
