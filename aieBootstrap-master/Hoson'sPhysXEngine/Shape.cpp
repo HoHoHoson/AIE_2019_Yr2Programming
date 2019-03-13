@@ -1,93 +1,30 @@
 #include "Shape.h"
 #include <Gizmos.h>
 
-Shape::Shape(glm::vec2 pos, glm::vec2 vel, float mass, glm::vec2 extents, float drag, glm::vec4 colour, float elasticity) : RigidBody(BOX, pos, vel, mass, drag, elasticity)
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+Shape::Shape(glm::vec2 pos, glm::vec2 vel, float mass, float drag, int vertices, float radius, glm::vec4 colour, float elasticity) : RigidBody(SHAPE, pos, vel, mass, drag, elasticity)
 {
-	m_Extents = extents;
+	m_Vertices = vertices < 3 ? 0 : vertices;
+	m_Radius = radius;
 	m_Colour = colour;
 }
 
 void Shape::makeGizmo()
 {
-	glm::vec2 p1 = m_Position - m_LocalX * m_Extents.x - m_LocalY * m_Extents.y;
-	glm::vec2 p2 = m_Position + m_LocalX * m_Extents.x - m_LocalY * m_Extents.y;
-	glm::vec2 p3 = m_Position - m_LocalX * m_Extents.x + m_LocalY * m_Extents.y;
-	glm::vec2 p4 = m_Position + m_LocalX * m_Extents.x + m_LocalY * m_Extents.y;
-	aie::Gizmos::add2DTri(p1, p2, p4, m_Colour);
-	aie::Gizmos::add2DTri(p1, p4, p3, m_Colour);
-}
-
-//void Shape::fixedUpdate(glm::vec2 gravity, float timeStep)
-//{
-//	RigidBody::fixedUpdate(gravity, timeStep);
-//
-//	//float cs = cosf(m_Rotation);
-//	//float sn = sinf(m_Rotation);
-//	m_LocalX = glm::normalize(glm::vec2(cs, sn));
-//	m_LocalY = glm::normalize(glm::vec2(-sn, cs));
-//}
-
-bool Shape::checkBoxCorners(const Shape& box, glm::vec2 & contact, int & numContacts, glm::vec2 & edgeNormal, glm::vec2 & contactForce)
-{
-	float boxW = box.getExtents().x * 2;
-	float boxH = box.getExtents().y * 2;
-	float penetration = 0;
-
-	for (float x = -box.getExtents().x; x < boxW; x += boxW)
+	if (m_Vertices == 0)
 	{
-		for (float y = -box.getExtents().y; y < boxH; y += boxH)
+		aie::Gizmos::add2DCircle(m_Position, m_Radius, 36, m_Colour);
+	}
+	else
+	{
+		for (float i = 0; i < m_Vertices; ++i)
 		{
-			glm::vec2 p = box.m_Position + x * box.m_LocalX + y * box.m_LocalY;
-			glm::vec2 p0(glm::dot(p - m_Position, m_LocalX), glm::dot(p - m_Position, m_LocalY));
-			float w2 = m_Extents.x;
-			float h2 = m_Extents.y;
+			glm::vec2 start(m_Radius * cosf((2 * M_PI) * (i / m_Vertices) + 0) + m_Position.x, m_Radius * sinf((2 * M_PI) * (i / m_Vertices) + 0) + m_Position.y);
+			glm::vec2 end(m_Radius * cosf((2 * M_PI) * ((i + 1) / m_Vertices) + 0) + m_Position.x, m_Radius * sinf((2 * M_PI) * ((i + 1) / m_Vertices) + 0) + m_Position.y);
 
-			if (p0.y <= h2 && p0.y >= -h2)
-			{
-				if (p0.x > 0 && p0.x < w2)
-				{
-					numContacts++;
-					contact += m_Position + w2 * m_LocalX + p0.y * m_LocalY;
-					edgeNormal = m_LocalX;
-					penetration = w2 - p0.x;
-				}
-				if (p0.x < 0 && p0.x > -w2)
-				{
-					numContacts++;
-					contact += m_Position - w2 * m_LocalX + p0.y * m_LocalY;
-					edgeNormal = -m_LocalX;
-					penetration = w2 + p0.x;
-				}
-			}
-
-			if (p0.x <= w2 && p0.x >= -w2)
-			{
-				if (p0.y > 0 && p0.y < h2)
-				{
-					numContacts++;
-					contact += m_Position + p0.x * m_LocalX + h2 * m_LocalY;
-					float pen0 = h2 - p0.y;
-					if (pen0 < penetration || penetration == 0)
-					{
-						penetration = pen0;
-						edgeNormal = m_LocalY;
-					}
-				}
-				if (p0.y < 0 && p0.y > -h2)
-				{
-					numContacts++;
-					contact += m_Position + p0.x * m_LocalX - h2 * m_LocalY;
-					float pen0 = h2 + p0.y;
-					if (pen0 < penetration || penetration == 0)
-					{
-						penetration = pen0;
-						edgeNormal = -m_LocalY;
-					}
-				}
-			}
+			aie::Gizmos::add2DTri(m_Position, start, end, m_Colour);
 		}
 	}
-
-	contactForce = penetration * edgeNormal;
-	return (penetration != 0);
 }
