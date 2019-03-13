@@ -24,6 +24,10 @@ public:
 	void checkForCollision() const;
 
 	static bool planeToPlane(PhysicsObject* obj1, PhysicsObject* obj2);
+	static bool planeToShape(PhysicsObject* obj1, PhysicsObject* obj2);
+	static bool shapeToPlane(PhysicsObject* obj1, PhysicsObject* obj2);
+	static bool shapeToShape(PhysicsObject* obj1, PhysicsObject* obj2);
+
 	static bool planeToSphere(PhysicsObject* obj1, PhysicsObject* obj2);
 	static bool planeToBox(PhysicsObject* obj1, PhysicsObject* obj2);
 	static bool sphereToPlane(PhysicsObject* obj1, PhysicsObject* obj2);

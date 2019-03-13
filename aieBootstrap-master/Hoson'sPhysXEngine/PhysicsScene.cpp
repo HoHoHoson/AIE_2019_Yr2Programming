@@ -120,6 +120,14 @@ static fn collisionFunctionArray[] =
 	PhysicsScene::boxToPlane, PhysicsScene::boxToSphere, PhysicsScene::boxToBox,
 };
 
+typedef bool(*fPtr)(PhysicsObject*, PhysicsObject*);
+
+static fPtr collisionSATArray[] =
+{
+	PhysicsScene::planeToPlane, PhysicsScene::planeToShape,
+	PhysicsScene::shapeToPlane, PhysicsScene::shapeToShape
+};
+
 void PhysicsScene::checkForCollision() const
 {
 	int actorCount = (int)m_actors.size();
@@ -148,6 +156,21 @@ void PhysicsScene::checkForCollision() const
 }
 
 bool PhysicsScene::planeToPlane(PhysicsObject * obj1, PhysicsObject * obj2)
+{
+	return false;
+}
+
+bool PhysicsScene::planeToShape(PhysicsObject* obj1, PhysicsObject* pbj2)
+{
+	return false;
+}
+
+bool PhysicsScene::shapeToPlane(PhysicsObject * obj1, PhysicsObject * obj2)
+{
+	return false;
+}
+
+bool PhysicsScene::shapeToShape(PhysicsObject * obj1, PhysicsObject * obj2)
 {
 	return false;
 }
