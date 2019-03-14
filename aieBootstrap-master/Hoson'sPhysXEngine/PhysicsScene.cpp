@@ -141,16 +141,12 @@ void PhysicsScene::checkForCollision() const
 			int shapeID1 = obj1->getShapeID();
 			int shapeID2 = obj2->getShapeID();
 
-			// Temporary until the SAT collision system is implemented
-			if (shapeID1 == SHAPE || shapeID2 == SHAPE)
-				continue;
-
 			int functionIDx = (shapeID1 * SHAPE_COUNT) + shapeID2;
-			fn collisionFunctionPtr = collisionFunctionArray[functionIDx];
+			fPtr SATfunctionPtr = collisionSATArray[functionIDx];
 
-			if (collisionFunctionPtr != nullptr)
+			if (SATfunctionPtr != nullptr)
 			{
-				collisionFunctionPtr(obj1, obj2);
+				SATfunctionPtr(obj1, obj2);
 			}
 		}
 }
@@ -167,6 +163,7 @@ bool PhysicsScene::planeToShape(PhysicsObject* obj1, PhysicsObject* pbj2)
 
 bool PhysicsScene::shapeToPlane(PhysicsObject * obj1, PhysicsObject * obj2)
 {
+	planeToShape(obj2, obj1);
 	return false;
 }
 
