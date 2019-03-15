@@ -19,12 +19,25 @@ void Shape::makeGizmo()
 	}
 	else
 	{
-		for (float i = 0; i < m_Vertices; ++i)
+		for (int i = 0; i < m_Vertices; ++i)
 		{
-			glm::vec2 start(m_Radius * cosf((2 * M_PI) * (i / m_Vertices) + 0) + m_Position.x, m_Radius * sinf((2 * M_PI) * (i / m_Vertices) + 0) + m_Position.y);
-			glm::vec2 end(m_Radius * cosf((2 * M_PI) * ((i + 1) / m_Vertices) + 0) + m_Position.x, m_Radius * sinf((2 * M_PI) * ((i + 1) / m_Vertices) + 0) + m_Position.y);
+			glm::vec2 start(getVertice(i));
+			glm::vec2 end(getVertice(i + 1));
 
 			aie::Gizmos::add2DTri(m_Position, start, end, m_Colour);
 		}
 	}
+}
+
+/* Returns the nth vertice */
+vec2 Shape::getVertice(int n)
+{
+	assert(n < 0 && n >= m_Vertices);
+	float nth = n - 1;
+
+	// May replace the "0" with the objects rotation in radians if I get to it
+	float x = m_Radius * cosf((2 * M_PI) * (nth / m_Vertices) + 0) + m_Position.x;
+	float y = m_Radius * sinf((2 * M_PI) * (nth / m_Vertices) + 0) + m_Position.y;
+
+	return vec2(x, y);
 }

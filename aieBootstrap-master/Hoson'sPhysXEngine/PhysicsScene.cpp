@@ -9,6 +9,8 @@
 #include "Shape.h"
 #include "Box.h"
 
+using glm::vec2;
+
 // This constructir has an initialisation list. It can call a base class constructor and/or be used to initialise const and normal variables.
 PhysicsScene::PhysicsScene(): m_timeStep(0.01f), m_gravity(glm::vec2(0, 0))
 {
@@ -169,6 +171,52 @@ bool PhysicsScene::shapeToPlane(PhysicsObject * obj1, PhysicsObject * obj2)
 
 bool PhysicsScene::shapeToShape(PhysicsObject * obj1, PhysicsObject * obj2)
 {
+	Shape* s1 = dynamic_cast<Shape*>(obj1);
+	Shape* s2 = dynamic_cast<Shape*>(obj2);
+	assert(s1 && s2);
+
+	if (s1->getVertices() == 0 && s2->getVertices() == 0)
+	{
+
+	}
+	else if (s1->getVertices() == 0 || s2->getVertices() == 0)
+	{
+		Shape* circle = nullptr;
+		Shape* polygon = nullptr;
+
+		if (s1->getVertices() == 0)
+		{
+			circle = s1;
+			polygon = s2;
+		}
+		else
+		{
+			circle = s2;
+			polygon = s1;
+		}
+
+		// Sphere - Polygon collision logic here
+	}
+	else
+	{
+		vec2 s1Min;
+		vec2 s1Max;
+		vec2 s2Min;
+		vec2 s2Max;
+		vec2 axis;
+		float penetration;
+
+		if (isSATintersect(s1, s2, s1Min, s1Max, s2Min, s2Max, axis, penetration))
+		{
+			if (isSATintersect(s1, s2, s1Min, s1Max, s2Min, s2Max, axis, penetration))
+			{
+				// resolve collision
+			}
+		}
+		else
+			return false;
+	}
+
 	return false;
 }
 
@@ -332,6 +380,93 @@ bool PhysicsScene::boxToBox(PhysicsObject * obj1, PhysicsObject * obj2)
 		return false;
 	
 	b1->resolveCollision(b2);
+
+	return true;
+}
+
+void PhysicsScene::setSATmaxmin(const vec2 & axis, Shape* s, float & min, float & max, vec2* pMin, vec2* pMax)
+{
+	for (int j = 0; j < s->getVertices(); ++j)
+	{
+		float dot = glm::dot(axis, s->getVertice(j));
+
+		if (!pMin && !pMax)
+		{
+			pMin = new vec2(s->getVertice(j));
+			pMax = new vec2(s->getVertice(j));
+			min = dot;
+			max = dot;
+
+			continue;
+		}
+
+		if (dot < min)
+		{
+			min = dot;
+			*pMin = s->getVertice(j);
+		}
+		else if (dot > max)
+		{
+			max = dot;
+			*pMax = s->getVertice(j);
+		}
+	}
+}
+
+bool PhysicsScene::isSATintersect(Shape* mainS, Shape* secondaryS, vec2& mainMin, vec2& mainMax, vec2& secondaryMin, vec2& secondaryMax, vec2& axis, float& pen)
+{
+	int mainVertices = mainS->getVertices() % 2 == 0 ? mainS->getVertices() / 2 : mainS->getVertices();
+
+	for (int i = 0; i < mainVertices; ++i)
+	{
+		vec2 start(mainS->getVertice(i));
+		vec2 end(mainS->getVertice(i + 1));
+
+		vec2 perp = glm::normalize(end - start);
+		perp = glm::vec2(-perp.y, perp.x);
+
+		float s1Min;
+		float s1Max;
+		vec2* s1pMin = nullptr;
+		vec2* s1pMax = nullptr;
+
+		float s2Min;
+		float s2Max;
+		vec2* s2pMin = nullptr;
+		vec2* s2pMax = nullptr;
+
+		setSATmaxmin(perp, mainS, s1Min, s1Max, s1pMin, s1pMax);
+		setSATmaxmin(perp, secondaryS, s2Min, s2Max, s2pMin, s2pMax);
+
+		if (s1Min > s2Max || s2Min > s1Max)
+		{
+			float penetration = s1Min > s2Max ? (s1Min - s2Max) : (s2Min - s1Max);
+			
+			if (penetration < pen)
+			{
+				pen = penetration;
+				axis = perp;
+				mainMax = *s1pMax;
+				mainMin = *s1pMin;
+				secondaryMax = *s2pMax;
+				secondaryMin = *s2pMin;
+			}
+
+			delete s1pMin;
+			delete s1pMax;
+			delete s2pMin;
+			delete s2pMax;
+		}
+		else
+		{
+			delete s1pMin;
+			delete s1pMax;
+			delete s2pMin;
+			delete s2pMax;
+
+			return false;
+		}
+	}
 
 	return true;
 }

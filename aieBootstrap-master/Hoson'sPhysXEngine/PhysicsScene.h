@@ -18,7 +18,7 @@ public:
 	void updateGizmos() const;
 	void debugScene();
 
-	void setGravity(const glm::vec2 gravity) { m_gravity = gravity; }
+	void setGravity(const glm::vec2& gravity) { m_gravity = gravity; }
 	void setScreenDimensions(int sWidth, int sHeight) { m_ScreenWidth = sWidth; m_ScreenHeight = sHeight; }
 
 	void checkForCollision() const;
@@ -45,4 +45,9 @@ protected:
 
 	int m_ScreenWidth;
 	int m_ScreenHeight;
+
+private:
+
+	static void setSATmaxmin(const vec2& axis, Shape* s, float& min, float& max, vec2* pMin, vec2* pMax);
+	static bool isSATintersect(Shape* mainS, Shape* secondaryS, vec2& s1Min, vec2& s1Max, vec2& s2Min, vec2& s2Max, vec2& axis, float& penetration);
 };
