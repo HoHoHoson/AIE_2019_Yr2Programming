@@ -17,8 +17,6 @@ public:
 	glm::vec2 getNormal()	const { return m_Normal; }
 	float getDistance()		const { return m_DistanceToOrigin; }
 
-	void resolveCollision(RigidBody* other);
-
 protected:
 
 	glm::vec2 m_Normal;

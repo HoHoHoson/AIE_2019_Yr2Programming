@@ -1,5 +1,6 @@
 #include <iostream>
 #include "RigidBody.h"
+#include "Plane.h"
 
 #define MIN_LINEAR_THRESEHOLD 0.01
 #define MIN_ROTATION_THRESEHOLD 0.01
@@ -48,4 +49,12 @@ void RigidBody::resolveCollision(RigidBody* other, glm::vec2* collisionNormal)
 
 	applyForce(-force);
 	other->applyForce(force);
+}
+
+void RigidBody::resolveCollision(Plane * plane)
+{
+	float j = glm::dot(-(1.0f + m_Elasticity) * m_Velocity, plane->getNormal()) / (1 / m_Mass);
+	glm::vec2 force = j * plane->getNormal();
+
+	applyForce(force);
 }

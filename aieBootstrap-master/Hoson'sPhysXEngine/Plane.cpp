@@ -23,11 +23,3 @@ void Plane::makeGizmo()
 	
 	aie::Gizmos::add2DLine(start, end, colour);
 }
-
-void Plane::resolveCollision(RigidBody * other)
-{
-	float j = glm::dot(-(1.0f + other->getElasticity()) * other->getVelocity(), m_Normal) / (1 / other->getMass());
-	glm::vec2 force = j * m_Normal;
-
-	other->applyForce(force);
-}

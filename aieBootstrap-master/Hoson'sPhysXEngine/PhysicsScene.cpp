@@ -7,10 +7,7 @@
 #include "Sphere.h"
 #include "Plane.h"
 #include "Shape.h"
-#include "Box.h"
-
-using glm::vec2;
-
+#include <Gizmos.h>
 // This constructir has an initialisation list. It can call a base class constructor and/or be used to initialise const and normal variables.
 PhysicsScene::PhysicsScene(): m_timeStep(0.01f), m_gravity(glm::vec2(0, 0))
 {
@@ -22,6 +19,7 @@ PhysicsScene::~PhysicsScene()
 	for (auto pAct : m_actors)
 	{
 		delete pAct;
+		vec2 h = vec2(0);
 	}
 }
 
@@ -113,15 +111,6 @@ void PhysicsScene::debugScene()
 	}
 }
 
-typedef bool(*fn)(PhysicsObject*, PhysicsObject*);
-
-static fn collisionFunctionArray[] =
-{
-	PhysicsScene::planeToPlane, PhysicsScene::planeToSphere, PhysicsScene::planeToBox,
-	PhysicsScene::sphereToPlane, PhysicsScene::sphereToSphere, PhysicsScene::sphereToBox,
-	PhysicsScene::boxToPlane, PhysicsScene::boxToSphere, PhysicsScene::boxToBox,
-};
-
 typedef bool(*fPtr)(PhysicsObject*, PhysicsObject*);
 
 static fPtr collisionSATArray[] =
@@ -158,8 +147,30 @@ bool PhysicsScene::planeToPlane(PhysicsObject * obj1, PhysicsObject * obj2)
 	return false;
 }
 
-bool PhysicsScene::planeToShape(PhysicsObject* obj1, PhysicsObject* pbj2)
+bool PhysicsScene::planeToShape(PhysicsObject* obj1, PhysicsObject* obj2)
 {
+	Plane* p = dynamic_cast<Plane*>(obj1);
+	Shape* s = dynamic_cast<Shape*>(obj2);
+	assert(p && s);
+
+	if (s->getVertices() == 0)
+	{
+		float dis = glm::dot(p->getNormal(), s->getPosition()) - p->getDistance();
+
+		if (dis - s->getRadius() < 0)
+		{
+			// Restitution of intersected postions after colliding
+			glm::vec2 planeIntersect = s->getPosition() - (p->getNormal() * dis);
+			s->setPosition(planeIntersect + p->getNormal() * s->getRadius());
+
+			s->resolveCollision(p);
+
+			return true;
+		}
+
+		return false;
+	}
+
 	return false;
 }
 
@@ -177,7 +188,28 @@ bool PhysicsScene::shapeToShape(PhysicsObject * obj1, PhysicsObject * obj2)
 
 	if (s1->getVertices() == 0 && s2->getVertices() == 0)
 	{
+		glm::vec2 dis = s2->getPosition() - s1->getPosition();
+		float mag2 = powf(dis.x, 2) + powf(dis.y, 2);
+		float radii2 = powf(s1->getRadius() + s2->getRadius(), 2);
 
+		if (mag2 < radii2)
+		{
+			// Restitution of intersected postions after colliding
+			float intersectLength = (sqrtf(radii2) - sqrtf(mag2));
+			glm::vec2 collisionNormal = glm::normalize(s2->getPosition() - s1->getPosition());
+			float totalMass = s1->getMass() + s2->getMass();
+
+			s1->setPosition(s1->getPosition() - (((1 - (s1->getMass()) / totalMass)) * intersectLength) * collisionNormal);
+			s2->setPosition(s2->getPosition() + (((1 - (s2->getMass()) / totalMass)) * intersectLength) * collisionNormal);
+
+			glm::vec2 contact = 0.5f * (s1->getPosition() + s2->getPosition());
+
+			s1->resolveCollision(s2, &collisionNormal);
+
+			return true;
+		}
+
+		return false;
 	}
 	else if (s1->getVertices() == 0 || s2->getVertices() == 0)
 	{
@@ -199,18 +231,31 @@ bool PhysicsScene::shapeToShape(PhysicsObject * obj1, PhysicsObject * obj2)
 	}
 	else
 	{
-		vec2 s1Min;
-		vec2 s1Max;
-		vec2 s2Min;
-		vec2 s2Max;
+		Shape* pointsShape = nullptr;
+		vec2 closestPoint;
 		vec2 axis;
 		float penetration;
 
-		if (isSATintersect(s1, s2, s1Min, s1Max, s2Min, s2Max, axis, penetration))
+		if (isSATintersect(s1, s2, axis, penetration, closestPoint, pointsShape))
 		{
-			if (isSATintersect(s1, s2, s1Min, s1Max, s2Min, s2Max, axis, penetration))
+			if (isSATintersect(s2, s1, axis, penetration, closestPoint, pointsShape))
 			{
-				// resolve collision
+				// Collision Restitution
+				float totalMass = s1->getMass() + s2->getMass();
+				vec2 s1Restitution = (((1 - (s1->getMass()) / totalMass)) * penetration) * axis;
+				vec2 s2Restitution = -(((1 - (s2->getMass()) / totalMass)) * penetration) * axis;
+
+				s1->setPosition(s1->getPosition() + s1Restitution);
+				s2->setPosition(s2->getPosition() + s2Restitution);
+
+				if (pointsShape == s1)
+					closestPoint += s1Restitution;
+				else
+					closestPoint += s2Restitution;
+
+				s1->resolveCollision(s2);
+
+				return true;
 			}
 		}
 		else
@@ -220,171 +265,7 @@ bool PhysicsScene::shapeToShape(PhysicsObject * obj1, PhysicsObject * obj2)
 	return false;
 }
 
-bool PhysicsScene::planeToSphere(PhysicsObject * obj1, PhysicsObject * obj2)
-{
-	Plane* p = dynamic_cast<Plane*>(obj1);
-	Sphere* s = dynamic_cast<Sphere*>(obj2);
-	assert(p != nullptr && s != nullptr);
-
-	float dis = glm::dot(p->getNormal(), s->getPosition()) - p->getDistance();
-
-	if (dis - s->getRadius() < 0)
-	{
-		// Restitution of intersected postions after colliding
-		glm::vec2 planeIntersect = s->getPosition() - (p->getNormal() * dis);
-		s->setPosition(planeIntersect + p->getNormal() * s->getRadius());
-
-		p->resolveCollision(s);
-
-		return true;
-	}
-
-	return false;
-}
-
-bool PhysicsScene::planeToBox(PhysicsObject * obj1, PhysicsObject * obj2)
-{
-	Plane* p = dynamic_cast<Plane*>(obj1);
-	Box* b = dynamic_cast<Box*>(obj2);
-	assert(p && b);
-
-	float distanceMax = 0;
-
-	for (float x = b->getPosition().x - b->getExtents().x; x <= (b->getPosition().x + b->getExtents().x); x += (b->getExtents().x * 2))
-	{
-		for (float y = b->getPosition().y - b->getExtents().y; y <= (b->getPosition().y + b->getExtents().y); y += (b->getExtents().y * 2))
-		{
-			glm::vec2 point(x, y);
-			float distance = glm::dot(point, p->getNormal()) - p->getDistance();
-
-			if (distance < distanceMax)
-				distanceMax = distance;
-		}
-	}
-
-	if (distanceMax < 0)
-	{
-		b->setPosition(b->getPosition() + (p->getNormal() * distanceMax * -1.0f));
-		p->resolveCollision(b);
-
-		return true;
-	}
-
-	return false;
-}
-
-bool PhysicsScene::sphereToPlane(PhysicsObject * obj1, PhysicsObject * obj2)
-{
-	planeToSphere(obj2, obj1);
-
-	return false;
-}
-
-bool PhysicsScene::sphereToSphere(PhysicsObject* obj1, PhysicsObject* obj2)
-{
-	Sphere* s1 = dynamic_cast<Sphere*>(obj1);
-	Sphere* s2 = dynamic_cast<Sphere*>(obj2);
-	assert(s1 != nullptr && s2 != nullptr);
-
-	glm::vec2 dis = s2->getPosition() - s1->getPosition();
-	float mag2 = powf(dis.x, 2) + powf(dis.y, 2);
-	float radii2 = powf(s1->getRadius() + s2->getRadius(), 2);
-
-	if (mag2 < radii2)
-	{
-		// Restitution of intersected postions after colliding
-		float intersectLength = (sqrtf(radii2) - sqrtf(mag2));
-		glm::vec2 collisionNormal = glm::normalize(s2->getPosition() - s1->getPosition());
-		float totalMass = s1->getMass() + s2->getMass();
-
-		s1->setPosition(s1->getPosition() - (((1 - (s1->getMass()) / totalMass)) * intersectLength) * collisionNormal);
-		s2->setPosition(s2->getPosition() + (((1 - (s2->getMass()) / totalMass)) * intersectLength) * collisionNormal);
-
-		glm::vec2 contact = 0.5f * (s1->getPosition() + s2->getPosition());
-
-		s1->resolveCollision(s2);
-
-		return true;
-	}
-
-	return false;
-}
-
-bool PhysicsScene::sphereToBox(PhysicsObject * obj1, PhysicsObject * obj2)
-{
-	Sphere* s = dynamic_cast<Sphere*>(obj1);
-	Box* b = dynamic_cast<Box*>(obj2);
-	assert(s && b);
-
-	glm::vec2 contactPoint = s->getPosition();
-
-	float xMin = b->getPosition().x - b->getExtents().x;
-	float xMax = b->getPosition().x + b->getExtents().x;
-	float yMin = b->getPosition().y - b->getExtents().y;
-	float yMax = b->getPosition().y + b->getExtents().y;
-
-	if (contactPoint.x < xMin)
-		contactPoint.x = xMin;
-	else if (contactPoint.x > xMax)
-		contactPoint.x = xMax;
-
-	if (contactPoint.y < yMin)
-		contactPoint.y = yMin;
-	else if (contactPoint.y > yMax)
-		contactPoint.y = yMax;
-
-	glm::vec2 displacement = contactPoint - s->getPosition();
-	float magPow2 = (displacement.x * displacement.x) + (displacement.y * displacement.y);
-
-	if ((magPow2 - (s->getRadius() * s->getRadius())) < 0)
-	{
-		s->resolveCollision(b);
-
-		return true;
-	}
-
-	return false;
-}
-
-bool PhysicsScene::boxToPlane(PhysicsObject * obj1, PhysicsObject * obj2)
-{
-	planeToBox(obj2, obj1);
-
-	return false;
-}
-
-bool PhysicsScene::boxToSphere(PhysicsObject * obj1, PhysicsObject * obj2)
-{
-	sphereToBox(obj2, obj1);
-
-	return false;
-}
-
-bool PhysicsScene::boxToBox(PhysicsObject * obj1, PhysicsObject * obj2)
-{
-	Box* b1 = dynamic_cast<Box*>(obj1);
-	Box* b2 = dynamic_cast<Box*>(obj2);
-	assert(b1 && b2);
-
-	float xMinb1 = b1->getPosition().x - b1->getExtents().x;
-	float xMaxb1 = b1->getPosition().x + b1->getExtents().x;
-	float yMinb1 = b1->getPosition().y - b1->getExtents().y;
-	float yMaxb1 = b1->getPosition().y + b1->getExtents().y;
-
-	float xMinb2 = b2->getPosition().x - b2->getExtents().x;
-	float xMaxb2 = b2->getPosition().x + b2->getExtents().x;
-	float yMinb2 = b2->getPosition().y - b2->getExtents().y;
-	float yMaxb2 = b2->getPosition().y + b2->getExtents().y;
-
-	if (xMinb1 > xMaxb2 || xMinb2 > xMaxb1 || yMinb1 > yMaxb2 || yMinb2 > yMaxb1)
-		return false;
-	
-	b1->resolveCollision(b2);
-
-	return true;
-}
-
-void PhysicsScene::setSATmaxmin(const vec2 & axis, Shape* s, float & min, float & max, vec2* pMin, vec2* pMax)
+void PhysicsScene::setSATmaxmin(const vec2& axis, Shape* s, float& min, float& max, vec2*& pMin, vec2*& pMax)
 {
 	for (int j = 0; j < s->getVertices(); ++j)
 	{
@@ -413,7 +294,7 @@ void PhysicsScene::setSATmaxmin(const vec2 & axis, Shape* s, float & min, float 
 	}
 }
 
-bool PhysicsScene::isSATintersect(Shape* mainS, Shape* secondaryS, vec2& mainMin, vec2& mainMax, vec2& secondaryMin, vec2& secondaryMax, vec2& axis, float& pen)
+bool PhysicsScene::isSATintersect(Shape* mainS, Shape* secondaryS, vec2& axis, float& pen, vec2& closestPoint, Shape*& pointsShape)
 {
 	int mainVertices = mainS->getVertices() % 2 == 0 ? mainS->getVertices() / 2 : mainS->getVertices();
 
@@ -440,31 +321,48 @@ bool PhysicsScene::isSATintersect(Shape* mainS, Shape* secondaryS, vec2& mainMin
 
 		if (s1Min > s2Max || s2Min > s1Max)
 		{
-			float penetration = s1Min > s2Max ? (s1Min - s2Max) : (s2Min - s1Max);
-			
-			if (penetration < pen)
-			{
-				pen = penetration;
-				axis = perp;
-				mainMax = *s1pMax;
-				mainMin = *s1pMin;
-				secondaryMax = *s2pMax;
-				secondaryMin = *s2pMin;
-			}
-
-			delete s1pMin;
-			delete s1pMax;
-			delete s2pMin;
-			delete s2pMax;
-		}
-		else
-		{
 			delete s1pMin;
 			delete s1pMax;
 			delete s2pMin;
 			delete s2pMax;
 
 			return false;
+		}
+		else
+		{
+			float penetration;
+			vec2 cPoint;
+
+			if ((s1Max - s2Min) < (s2Max - s1Min))
+			{
+				penetration = s1Max - s2Min;
+				cPoint = *s2pMin;
+			}
+			else
+			{
+				penetration = s2Max - s1Min;
+				cPoint = *s2pMax;
+			}
+
+			if (!pointsShape)
+			{
+				pen = penetration;
+				pointsShape = secondaryS;
+				closestPoint = cPoint;
+				axis = perp;
+			}
+			else if (penetration < pen)
+			{
+				pointsShape = secondaryS;
+				closestPoint = cPoint;
+				pen = penetration;
+				axis = perp;
+			}
+
+			delete s1pMin;
+			delete s1pMax;
+			delete s2pMin;
+			delete s2pMax;
 		}
 	}
 

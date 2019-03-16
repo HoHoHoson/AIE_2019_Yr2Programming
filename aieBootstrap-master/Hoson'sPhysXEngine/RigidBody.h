@@ -1,7 +1,10 @@
 #pragma once
 #include "PhysicsObject.h"
 
-class RigidBody : public PhysicsObject {
+class Plane;
+
+class RigidBody : public PhysicsObject 
+{
 public:
 	RigidBody(ShapeType shapeID, glm::vec2 position, glm::vec2 velocity, float mass, float drag, float elasticity);
 	~RigidBody();
@@ -22,6 +25,7 @@ public:
 	float setLinearDrag(float newValue) { m_LinearDrag = newValue; }
 
 	void resolveCollision(RigidBody* other, glm::vec2* collisionNormal = nullptr);
+	void resolveCollision(Plane* plane);
 
 protected:
 

@@ -32,8 +32,8 @@ void Shape::makeGizmo()
 /* Returns the nth vertice */
 vec2 Shape::getVertice(int n)
 {
-	assert(n < 0 && n >= m_Vertices);
-	float nth = n - 1;
+	float nth = (n % m_Vertices + m_Vertices) % m_Vertices;
+	assert(nth >= 0 && nth < m_Vertices);
 
 	// May replace the "0" with the objects rotation in radians if I get to it
 	float x = m_Radius * cosf((2 * M_PI) * (nth / m_Vertices) + 0) + m_Position.x;
