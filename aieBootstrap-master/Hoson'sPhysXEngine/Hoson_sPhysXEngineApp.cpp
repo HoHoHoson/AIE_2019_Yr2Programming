@@ -36,7 +36,7 @@ bool Hoson_sPhysXEngineApp::startup()
 
 	Shape* shape1 = new Shape(glm::vec2(0, 10), glm::vec2(0, -5), 1.0f, 0.0f, 3, 5.0f, glm::vec4(0, 1, 0, 1));
 	m_PhysicsScene->addActor(shape1);
-	Shape* shape2 = new Shape(glm::vec2(0, -10), glm::vec2(0, 5), 1.0f, 0.0f, 7, 5.0f, glm::vec4(1, 0, 0, 1));
+	Shape* shape2 = new Shape(glm::vec2(0, -10), glm::vec2(0, 5), 1.0f, 0.0f, 0, 5.0f, glm::vec4(1, 0, 0, 1));
 	m_PhysicsScene->addActor(shape2);
 
 	Plane* plane1 = new Plane(glm::vec2(1, 10), -50);

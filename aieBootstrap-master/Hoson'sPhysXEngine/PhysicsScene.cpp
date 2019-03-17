@@ -227,7 +227,62 @@ bool PhysicsScene::shapeToShape(PhysicsObject * obj1, PhysicsObject * obj2)
 			polygon = s1;
 		}
 
-		// Sphere - Polygon collision logic here
+		vec2 pointA;
+		vec2 pointB;
+		float* minDistance = nullptr;
+
+		for (int i = 0; i < polygon->getVertices(); ++i)
+		{
+			vec2 p1 = polygon->getVertice(i);
+			vec2 p2 = polygon->getVertice(i + 1);
+			float totalDisSqr = (p1.x * p1.x) + (p1.y * p1.y) + (p2.x * p2.x) + (p2.y * p2.y);
+			
+			if (minDistance == nullptr)
+			{
+				minDistance = new float(totalDisSqr);
+				pointA = p1;
+				pointB = p2;
+			}
+			else if (totalDisSqr < *minDistance)
+			{
+				*minDistance = totalDisSqr;
+				pointA = p1;
+				pointB = p2;
+			}
+		}
+
+		vec2 closestEdge = pointB - pointA;
+		vec2 eDisplacement = circle->getPosition() - pointA;
+		float edgeLengthSqr = (closestEdge.x * closestEdge.x) + (closestEdge.y * closestEdge.y);
+		float t = glm::dot(eDisplacement, closestEdge) / edgeLengthSqr;
+
+		if (t < 0)
+			t = 0;
+		else if (t > 1)
+			t = 1;
+
+		vec2 closestPoint = pointA + t * closestEdge;
+		vec2 pDisplacement = circle->getPosition() - closestPoint;
+		float disSqr = (pDisplacement.x * pDisplacement.x) + (pDisplacement.y * pDisplacement.y);
+		float radiusSqr = powf(circle->getRadius(), 2);
+
+		if (disSqr < radiusSqr)
+		{
+			float pen = (1 - disSqr / radiusSqr) * circle->getRadius();
+			float totalMass = circle->getMass() + polygon->getMass();
+			vec2 collisionNorm = glm::normalize(pDisplacement);
+			vec2 cRestitution = (1 - circle->getMass() / totalMass) * collisionNorm * pen;
+			vec2 pRestitution = (1 - polygon->getMass() / totalMass) * collisionNorm * pen;
+
+			polygon->setPosition(polygon->getPosition() - pRestitution);
+			circle->setPosition(circle->getPosition() + cRestitution);
+			closestPoint -= pRestitution;
+
+			circle->resolveCollision(polygon, &collisionNorm);
+			return true;
+		}
+
+		return false;
 	}
 	else
 	{
@@ -253,8 +308,7 @@ bool PhysicsScene::shapeToShape(PhysicsObject * obj1, PhysicsObject * obj2)
 				else
 					closestPoint += s2Restitution;
 
-				s1->resolveCollision(s2);
-
+				s1->resolveCollision(s2, &axis);
 				return true;
 			}
 		}
