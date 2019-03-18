@@ -3,7 +3,6 @@
 #include "Font.h"
 #include "Input.h"
 #include "PhysicsScene.h"
-#include "Sphere.h"
 #include "Plane.h"
 #include "Shape.h"
 #include <Gizmos.h>
@@ -31,8 +30,6 @@ bool Hoson_sPhysXEngineApp::startup()
 
 	m_PhysicsScene = new PhysicsScene();
 	m_PhysicsScene->setGravity(glm::vec2(0, -10));
-
-	m_PhysicsScene->setScreenDimensions(getWindowWidth(), getWindowHeight());
 
 	for (int i = 0; i < 13; ++i)
 	{

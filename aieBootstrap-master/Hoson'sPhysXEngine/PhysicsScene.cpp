@@ -4,7 +4,6 @@
 #include <Input.h>
 #include <list>
 #include <iostream>
-#include "Sphere.h"
 #include "Plane.h"
 #include "Shape.h"
 #include <Gizmos.h>
@@ -48,10 +47,7 @@ void PhysicsScene::update(float deltaTime)
 				
 				rb->fixedUpdate(m_gravity, m_timeStep);
 
-				if (rb->getPosition().y < 0 - m_ScreenHeight / 2)
-					itCheck = m_actors.erase(itCheck);
-				else
-					++itCheck;
+				++itCheck;
 			}
 		}
 
@@ -153,7 +149,7 @@ bool PhysicsScene::planeToShape(PhysicsObject* obj1, PhysicsObject* obj2)
 	Shape* s = dynamic_cast<Shape*>(obj2);
 	assert(p && s);
 
-	if (s->getVertices() == 0)
+	if (s->getVerticeCount() == 0)
 	{
 		float dis = glm::dot(p->getNormal(), s->getPosition()) - p->getDistance();
 
@@ -175,7 +171,7 @@ bool PhysicsScene::planeToShape(PhysicsObject* obj1, PhysicsObject* obj2)
 		float* minDistance = nullptr;
 		vec2 minPoint;
 
-		for (int i = 0; i < s->getVertices(); ++i)
+		for (int i = 0; i < s->getVerticeCount(); ++i)
 		{
 			vec2 point = s->getVertice(i);
 			float dis = glm::dot(point, p->getNormal()) - p->getDistance();
@@ -223,7 +219,7 @@ bool PhysicsScene::shapeToShape(PhysicsObject * obj1, PhysicsObject * obj2)
 	Shape* s2 = dynamic_cast<Shape*>(obj2);
 	assert(s1 && s2);
 
-	if (s1->getVertices() == 0 && s2->getVertices() == 0)
+	if (s1->getVerticeCount() == 0 && s2->getVerticeCount() == 0)
 	{
 		glm::vec2 dis = s2->getPosition() - s1->getPosition();
 		float mag2 = powf(dis.x, 2) + powf(dis.y, 2);
@@ -248,12 +244,12 @@ bool PhysicsScene::shapeToShape(PhysicsObject * obj1, PhysicsObject * obj2)
 
 		return false;
 	}
-	else if (s1->getVertices() == 0 || s2->getVertices() == 0)
+	else if (s1->getVerticeCount() == 0 || s2->getVerticeCount() == 0)
 	{
 		Shape* circle = nullptr;
 		Shape* polygon = nullptr;
 
-		if (s1->getVertices() == 0)
+		if (s1->getVerticeCount() == 0)
 		{
 			circle = s1;
 			polygon = s2;
@@ -268,7 +264,7 @@ bool PhysicsScene::shapeToShape(PhysicsObject * obj1, PhysicsObject * obj2)
 		vec2 pointB;
 		float* minDistance = nullptr;
 
-		for (int i = 0; i < polygon->getVertices(); ++i)
+		for (int i = 0; i < polygon->getVerticeCount(); ++i)
 		{
 			vec2 p1 = polygon->getVertice(i);
 			vec2 p2 = polygon->getVertice(i + 1);
@@ -378,7 +374,7 @@ bool PhysicsScene::shapeToShape(PhysicsObject * obj1, PhysicsObject * obj2)
 
 void PhysicsScene::setSATmaxmin(const vec2& axis, Shape* s, float& min, float& max, vec2*& pMin, vec2*& pMax)
 {
-	for (int j = 0; j < s->getVertices(); ++j)
+	for (int j = 0; j < s->getVerticeCount(); ++j)
 	{
 		float dot = glm::dot(axis, s->getVertice(j));
 
@@ -407,7 +403,7 @@ void PhysicsScene::setSATmaxmin(const vec2& axis, Shape* s, float& min, float& m
 
 bool PhysicsScene::isSATintersect(Shape* mainS, Shape* secondaryS, vec2& axis, float& pen, vec2& closestPoint, Shape*& pointsShape)
 {
-	int mainVertices = mainS->getVertices() % 2 == 0 ? mainS->getVertices() / 2 : mainS->getVertices();
+	int mainVertices = mainS->getVerticeCount() % 2 == 0 ? mainS->getVerticeCount() / 2 : mainS->getVerticeCount();
 
 	for (int i = 0; i < mainVertices; ++i)
 	{

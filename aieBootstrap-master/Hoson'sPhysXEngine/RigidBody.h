@@ -22,7 +22,8 @@ public:
 	void setPosition(glm::vec2 newPos) { m_Position = newPos; }
 	void setVelocity(glm::vec2 newVel) { m_Velocity = newVel; }
 	void setMass(float newMass) { m_Mass = newMass; }
-	float setLinearDrag(float newValue) { m_LinearDrag = newValue; }
+	void setLinearDrag(float newValue) { m_LinearDrag = newValue; }
+	void setElasticity(float e) { m_Elasticity = e; }
 
 	void resolveCollision(RigidBody* other, glm::vec2* collisionNormal = nullptr);
 	void resolveCollision(Plane* plane);

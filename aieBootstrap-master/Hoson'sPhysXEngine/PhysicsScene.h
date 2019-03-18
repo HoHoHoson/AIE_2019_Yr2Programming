@@ -22,7 +22,6 @@ public:
 	void debugScene();
 
 	void setGravity(const glm::vec2& gravity) { m_gravity = gravity; }
-	void setScreenDimensions(int sWidth, int sHeight) { m_ScreenWidth = sWidth; m_ScreenHeight = sHeight; }
 
 	void checkForCollision() const;
 
@@ -36,9 +35,6 @@ protected:
 	glm::vec2 m_gravity;
 	float m_timeStep;
 	std::vector<PhysicsObject*> m_actors;
-
-	int m_ScreenWidth;
-	int m_ScreenHeight;
 
 private:
 

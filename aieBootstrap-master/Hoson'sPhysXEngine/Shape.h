@@ -14,7 +14,7 @@ public:
 	void debug() {}
 
 	/* Returns the total amount of vertices the polygon contains */
-	int getVertices() { return m_Vertices; }
+	int getVerticeCount() { return m_VerticeCount; }
 	float getRadius() { return m_Radius; }
 	vec4 getColour() { return m_Colour; }
 
@@ -22,7 +22,7 @@ public:
 
 protected:
 
-	int m_Vertices;
+	int m_VerticeCount;
 	float m_Radius;
 	vec4 m_Colour;
 };
