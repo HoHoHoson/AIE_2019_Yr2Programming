@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 64892389403861666}
   - component: {fileID: 54784503740013448}
   m_Layer: 0
-  m_Name: CrappyModem
+  m_Name: crappyModem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
