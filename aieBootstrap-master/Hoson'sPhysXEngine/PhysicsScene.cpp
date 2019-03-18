@@ -170,6 +170,43 @@ bool PhysicsScene::planeToShape(PhysicsObject* obj1, PhysicsObject* obj2)
 
 		return false;
 	}
+	else
+	{
+		float* minDistance = nullptr;
+		vec2 minPoint;
+
+		for (int i = 0; i < s->getVertices(); ++i)
+		{
+			vec2 point = s->getVertice(i);
+			float dis = glm::dot(point, p->getNormal()) - p->getDistance();
+
+			if (minDistance == nullptr)
+			{
+				minDistance = new float(dis);
+				minPoint = point;
+			}
+			else if (dis < *minDistance)
+			{
+				*minDistance = dis;
+				minPoint = point;
+			}
+		}
+
+		if (*minDistance < 0)
+		{
+			vec2 restitution = p->getNormal() * -*minDistance;
+			s->setPosition(s->getPosition() + restitution);
+
+			delete minDistance;
+
+			s->resolveCollision(p);
+			return true;
+		}
+
+		delete minDistance;
+
+		return false;
+	}
 
 	return false;
 }
@@ -235,7 +272,10 @@ bool PhysicsScene::shapeToShape(PhysicsObject * obj1, PhysicsObject * obj2)
 		{
 			vec2 p1 = polygon->getVertice(i);
 			vec2 p2 = polygon->getVertice(i + 1);
-			float totalDisSqr = (p1.x * p1.x) + (p1.y * p1.y) + (p2.x * p2.x) + (p2.y * p2.y);
+			vec2 p1C = circle->getPosition() - p1;
+			vec2 p2C = circle->getPosition() - p2;
+
+			float totalDisSqr = (p1C.x * p1C.x) + (p1C.y * p1C.y) + (p2C.x * p2C.x) + (p2C.y * p2C.y);
 			
 			if (minDistance == nullptr)
 			{
@@ -295,20 +335,37 @@ bool PhysicsScene::shapeToShape(PhysicsObject * obj1, PhysicsObject * obj2)
 		{
 			if (isSATintersect(s2, s1, axis, penetration, closestPoint, pointsShape))
 			{
+				// Makes sure the axis is pointing in the correct direction, away from its origin shape
+				if (pointsShape == s1)
+				{
+					if (glm::dot(closestPoint - s2->getPosition(), axis) < 0)
+						axis = -axis;
+				}
+				else if (glm::dot(closestPoint - s1->getPosition(), axis) < 0)
+					axis = -axis;
+
 				// Collision Restitution
 				float totalMass = s1->getMass() + s2->getMass();
-				vec2 s1Restitution = (((1 - (s1->getMass()) / totalMass)) * penetration) * axis;
-				vec2 s2Restitution = -(((1 - (s2->getMass()) / totalMass)) * penetration) * axis;
-
-				s1->setPosition(s1->getPosition() + s1Restitution);
-				s2->setPosition(s2->getPosition() + s2Restitution);
+				vec2 s1Restitution = (1 - s1->getMass() / totalMass) * penetration * axis;
+				vec2 s2Restitution = (1 - s2->getMass() / totalMass) * penetration * axis;
 
 				if (pointsShape == s1)
-					closestPoint += s1Restitution;
-				else
-					closestPoint += s2Restitution;
+				{
+					s1->setPosition(s1->getPosition() + s1Restitution);
+					s2->setPosition(s2->getPosition() - s2Restitution);
 
-				s1->resolveCollision(s2, &axis);
+					closestPoint += s1Restitution;
+					s2->resolveCollision(s1, &axis);
+				}
+				else
+				{
+					s1->setPosition(s1->getPosition() - s1Restitution);
+					s2->setPosition(s2->getPosition() + s2Restitution);
+
+					closestPoint += s2Restitution;
+					s1->resolveCollision(s2, &axis);
+				}
+
 				return true;
 			}
 		}
