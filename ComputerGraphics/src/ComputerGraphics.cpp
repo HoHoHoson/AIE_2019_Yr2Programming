@@ -48,6 +48,7 @@ bool ComputerGraphics::startUp()
 	glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	m_Camera = new FreeCamera(m_Window, 5.0f);
+	m_Camera->setLookAt(vec3(10, 10, 10), vec3(0), vec3(0, 1, 0));
 
 	return true;
 }

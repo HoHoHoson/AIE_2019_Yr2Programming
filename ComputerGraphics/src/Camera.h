@@ -36,5 +36,8 @@ protected:
 	mat4 m_ProjectionTransform;
 	mat4 m_ProjectionViewTransform;
 
+	float m_Yaw;
+	float m_Pitch;
+
 	void updateProjectionViewTransform();
 };

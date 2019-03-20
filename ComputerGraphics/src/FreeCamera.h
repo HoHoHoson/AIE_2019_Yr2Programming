@@ -22,7 +22,5 @@ private:
 	bool    m_StartMouse;
 	float   m_LastPosX;
 	float	m_LastPosY;
-	float	m_Yaw;
-	float	m_Pitch;
 	float	m_Sensitivity;
 };

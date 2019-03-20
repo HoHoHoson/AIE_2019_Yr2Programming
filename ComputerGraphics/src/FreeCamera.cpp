@@ -8,8 +8,6 @@ FreeCamera::FreeCamera(GLFWwindow* window, float speed) : Camera(window)
 	m_StartMouse = true;
 	m_LastPosX = 0;
 	m_LastPosY = 0;
-	m_Yaw = 0;
-	m_Pitch = 0;
 	m_Sensitivity = 0.05f;
 }
 
