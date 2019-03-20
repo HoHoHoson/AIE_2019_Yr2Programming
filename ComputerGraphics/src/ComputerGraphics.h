@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+class Camera;
+
 class ComputerGraphics
 {
 public:
@@ -15,12 +17,11 @@ public:
 	virtual bool startUp();
 	virtual void shutDown();
 
-	virtual bool update();
+	virtual bool update(float deltaTime);
 	virtual void draw();
 
 protected:
 
-	GLFWwindow* window;
-	glm::mat4 view;
-	glm::mat4 projection;
+	GLFWwindow* m_Window;
+	Camera* m_Camera;
 };

@@ -1,4 +1,5 @@
 #include "ComputerGraphics.h"
+#include "FreeCamera.h"
 #include <Gizmos.h>
 
 #include <iostream>
@@ -21,19 +22,19 @@ bool ComputerGraphics::startUp()
 	if (glfwInit() == false)
 		return false;
 
-	window = glfwCreateWindow(1280, 720, "Computer Graphics", nullptr, nullptr);
+	m_Window = glfwCreateWindow(1280, 720, "Computer Graphics", nullptr, nullptr);
 
-	if (window == nullptr)
+	if (m_Window == nullptr)
 	{
 		glfwTerminate();
 		return false;
 	}
 
-	glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(m_Window);
 
 	if (ogl_LoadFunctions() == ogl_LOAD_FAILED)
 	{
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(m_Window);
 		glfwTerminate();
 		return false;
 	}
@@ -44,8 +45,9 @@ bool ComputerGraphics::startUp()
 
 	Gizmos::create(255U, 255U, 65535U, 65535U);
 
-	view = glm::lookAt(vec3(10, 10, 10), vec3(0), vec3(0, 1, 0));
-	projection = glm::perspective(glm::pi<float>() * 0.25f, 16 / 9.0f, 0.1f, 1000.0f);
+	glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	m_Camera = new FreeCamera(m_Window, 5.0f);
 
 	return true;
 }
@@ -53,14 +55,16 @@ bool ComputerGraphics::startUp()
 void ComputerGraphics::shutDown()
 {
 	Gizmos::destroy();
-	glfwDestroyWindow(window);
+	glfwDestroyWindow(m_Window);
 	glfwTerminate();
 }
 
-bool ComputerGraphics::update()
+bool ComputerGraphics::update(float deltaTime)
 {
-	if (glfwWindowShouldClose(window) == true || glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	if (glfwWindowShouldClose(m_Window) == true || glfwGetKey(m_Window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		return false;
+
+	m_Camera->update(deltaTime);
 
 	return true;
 }
@@ -89,7 +93,7 @@ void ComputerGraphics::draw()
 
 	// DRAW END
 
-	Gizmos::draw(projection * view);
-	glfwSwapBuffers(window);
+	Gizmos::draw(m_Camera->getProjectionView());
+	glfwSwapBuffers(m_Window);
 	glfwPollEvents();
 }
