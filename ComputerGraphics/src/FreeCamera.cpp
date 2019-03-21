@@ -32,10 +32,10 @@ void FreeCamera::update(float deltaTime)
 
 	if (m_LastPosX != *posX || m_LastPosY != *posY)
 	{
-		float deltaX = *posX - m_LastPosX;
-		float deltaY = *posY - m_LastPosY;
-		m_LastPosX = *posX;
-		m_LastPosY = *posY;
+		float deltaX = (float)*posX - m_LastPosX;
+		float deltaY = (float)*posY - m_LastPosY;
+		m_LastPosX = (float)*posX;
+		m_LastPosY = (float)*posY;
 
 		deltaX *= m_Sensitivity;
 		deltaY *= m_Sensitivity;

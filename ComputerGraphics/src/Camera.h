@@ -3,8 +3,6 @@
 #include "gl_core_4_4.h"
 #include <GLFW/glfw3.h>
 
-class GLFWwindow;
-
 using glm::vec3;
 using glm::vec4;
 using glm::mat4;

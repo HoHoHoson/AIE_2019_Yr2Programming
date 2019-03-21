@@ -10,7 +10,7 @@ int main()
 
 	if (cgApp->startUp() == true)
 	{
-		while (cgApp->update(deltaTime) == true)
+		while (cgApp->update((float)deltaTime) == true)
 		{
 			currentTime = glfwGetTime();
 			deltaTime = currentTime - previousTime;
