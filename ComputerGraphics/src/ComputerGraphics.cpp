@@ -1,13 +1,7 @@
 #include "ComputerGraphics.h"
 #include "FreeCamera.h"
-#include <Gizmos.h>
 
 #include <iostream>
-
-using glm::vec3;
-using glm::vec4;
-using glm::mat4;
-using aie::Gizmos;
 
 ComputerGraphics::ComputerGraphics()
 {
@@ -48,21 +42,33 @@ bool ComputerGraphics::startUp()
 	glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	m_Camera = new FreeCamera(m_Window, 5.0f);
-	m_Camera->setLookAt(vec3(10, 10, 10), vec3(0), vec3(0, 1, 0));
+	m_Camera->setLookAt(vec3(10, 5, 0), vec3(0), vec3(0, 1, 0));
 
-	// Rendering Geometry
-	//m_Shader.loadShader(aie::eShaderStage::VERTEX, "../shaders/simple.vert");
-	//m_Shader.loadShader(aie::eShaderStage::FRAGMENT, "../shaders/simple.frag");
-	//if (m_Shader.link() == false)
-	//{
-	//	printf("Shader Error: %s\n", m_Shader.getLastError());
-	//	return false;
-	//}
-	//if (m_GridTexture.load("../data/numbered_grid.tga") == false)
-	//{
-	//	printf("Failed to load texture!\n");
-	//	return false;
-	//}
+	m_Light.diffuse = { 1, 1, 0 };
+	m_Light.specular = { 1, 1, 0 };
+	m_AmbientLight = { 0.25f, 0.25f, 0.25f };
+
+	/// Rendering Geometry
+	m_GeoShader.loadShader(aie::eShaderStage::VERTEX, "../shaders/phong.vert");
+	m_GeoShader.loadShader(aie::eShaderStage::FRAGMENT, "../shaders/phong.frag");
+	if (m_GeoShader.link() == false)
+	{
+		printf("Shader Error: %s\n", m_GeoShader.getLastError());
+		return false;
+	}
+	if (m_GridTexture.load("../data/numbered_grid.tga") == false)
+	{
+		printf("Failed to load texture!\n");
+		return false;
+	}
+
+	m_GeoTransform = {
+	10,0,0,0,
+	0,10,0,0,
+	0,0,10,0,
+	0,0,0,1
+	};
+	m_GeoMesh.initialiseQuad();
 
 	//Mesh::Vertex cubeVertices[8];
 	//cubeVertices[0].position = { -0.5f	, 0	, 0.5f	, 1 };		// Down Bottom-Right
@@ -77,9 +83,7 @@ bool ComputerGraphics::startUp()
 	//unsigned int cubeIndices[36] = { 0, 1, 2, 2, 1, 3, 4, 5, 6, 6, 7, 5, 0, 2, 4, 4, 6, 2, 1, 3, 5, 5, 7, 3, 0, 1, 4, 5, 4, 1 , 2, 3, 6, 7, 6, 3 };
 	//m_CubeTransform = mat4(1.0);	//m_CubeTransform = glm::translate(m_CubeTransform, vec3(0, 0, -4));	//m_CubeTransform = glm::scale(m_CubeTransform, vec3(3, 1, 3));	//m_CubeMesh.initialise(8, cubeVertices, 36, cubeIndices);
 
-	//m_CubeMesh.initialiseQuad();
-
-	// Rendering Models
+	/// Rendering Models
 	m_ModelShader.loadShader(aie::eShaderStage::VERTEX, "../shaders/textured.vert");
 	m_ModelShader.loadShader(aie::eShaderStage::FRAGMENT, "../shaders/textured.frag");
 	if (m_ModelShader.link() == false)
@@ -87,15 +91,15 @@ bool ComputerGraphics::startUp()
 		printf("Shader Error: %s\n", m_ModelShader.getLastError());
 		return false;
 	}
-	if (m_ModelMesh.load("../data/soulspear/soulspear.obj") == false)
+	if (m_ModelMesh.load("../data/soulspear/soulspear.obj", true, true) == false)
 	{
 		printf("Model Mesh Error!\n");
 		return false;
 	}
 
 	m_ModelTransform = mat4(1.0);
-	//m_ModelTransform = glm::translate(m_ModelTransform, vec3(0, 1, -4));
-	//m_ModelTransform = glm::scale(m_ModelTransform, vec3(0.5f, 0.5f, 0.5f));
+	m_ModelTransform = glm::translate(m_ModelTransform, vec3(0, 1, 0));
+	m_ModelTransform = glm::scale(m_ModelTransform, vec3(0.5f, 0.5f, 0.5f));
 
 	return true;
 }
@@ -112,6 +116,11 @@ bool ComputerGraphics::update(float deltaTime)
 	if (glfwWindowShouldClose(m_Window) == true || glfwGetKey(m_Window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		return false;
 
+	float time = glfwGetTime();
+	
+	m_ModelTransform = glm::rotate(m_ModelTransform, glm::radians(10.0f) * deltaTime, vec3(0, 0.5f, 0));
+	m_Light.direction = glm::normalize(vec3(glm::cos(time * 2), glm::sin(time * 2), 0));
+
 	m_Camera->update(deltaTime);
 
 	return true;
@@ -125,7 +134,7 @@ void ComputerGraphics::draw()
 
 	Gizmos::clear();
 
-	// DRAW BEGIN
+	/// DRAW BEGIN
 
 	Gizmos::addTransform(mat4(1));
 
@@ -139,22 +148,36 @@ void ComputerGraphics::draw()
 
 	Gizmos::addSphere(vec3(0, 0, 0), 1, 10, 10, vec4(0.97f, 0.71f, 0.22f, 0.5f));
 
-	mat4 pvm = m_Camera->getProjectionView() * m_CubeTransform;
+	mat4 pvm;
 
-	//m_Shader.bind();
-	//m_Shader.bindUniform("ProjectionViewModel", pvm);
+	// Geometry
+	m_GeoShader.bind();
 
-	//m_Shader.bindUniform("diffuseTexture", 0);
-	//m_GridTexture.bind(0);
+	pvm = m_Camera->getProjectionView() * m_GeoTransform;
 
-	//m_CubeMesh.draw();
+	m_GeoShader.bindUniform("Ia", m_AmbientLight);
+	m_GeoShader.bindUniform("Id", m_Light.diffuse);
+	m_GeoShader.bindUniform("Is", m_Light.specular);
+	m_GeoShader.bindUniform("LightDirection", m_Light.direction);
 
+	m_GeoShader.bindUniform("ProjectionViewModel", pvm);
+	m_GeoShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_GeoTransform)));
+	// m_GeoShader.bindUniform("diffuseTexture", 0);	For binding a texture to the GeoShader
+
+	// m_GridTexture.bind(0);	For texture binding
+
+	m_GeoMesh.draw();
+
+	// Model
 	m_ModelShader.bind();
+
 	pvm = m_Camera->getProjectionView() * m_ModelTransform;
+
 	m_ModelShader.bindUniform("ProjectionViewModel", pvm);
+
 	m_ModelMesh.draw();
 
-	// DRAW END
+	/// DRAW END
 
 	Gizmos::draw(m_Camera->getProjectionView());	glfwSwapBuffers(m_Window);
 	glfwPollEvents();
