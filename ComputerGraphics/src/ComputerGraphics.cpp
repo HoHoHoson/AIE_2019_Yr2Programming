@@ -44,8 +44,10 @@ bool ComputerGraphics::startUp()
 	m_Camera = new FreeCamera(m_Window, 5.0f);
 	m_Camera->setLookAt(vec3(10, 5, 0), vec3(0), vec3(0, 1, 0));
 
+	m_Light.direction = vec3(-1, 0, 0);
 	m_Light.diffuse = { 1, 1, 0 };
 	m_Light.specular = { 1, 1, 0 };
+
 	m_AmbientLight = { 0.25f, 0.25f, 0.25f };
 
 	/// Rendering Geometry
@@ -91,7 +93,7 @@ bool ComputerGraphics::startUp()
 		printf("Shader Error: %s\n", m_ModelShader.getLastError());
 		return false;
 	}
-	if (m_ModelMesh.load("../data/stanford/bunny.obj", true, true) == false)
+	if (m_ModelMesh.load("../data/soulspear/soulspear.obj", true, true) == false)
 	{
 		printf("Model Mesh Error!\n");
 		return false;
@@ -119,7 +121,6 @@ bool ComputerGraphics::update(float deltaTime)
 	float time = glfwGetTime();
 	
 	m_ModelTransform = glm::rotate(m_ModelTransform, glm::radians(10.0f) * deltaTime, vec3(0, 0.5f, 0));
-	m_Light.direction = glm::normalize(vec3(glm::cos(time * 2), glm::sin(time * 2), 0));
 
 	m_Camera->update(deltaTime);
 
@@ -151,23 +152,23 @@ void ComputerGraphics::draw()
 	mat4 pvm;
 
 	/// Geometry
-	m_GeoShader.bind();
+	//m_GeoShader.bind();
 
-	pvm = m_Camera->getProjectionView() * m_GeoTransform;
+	//pvm = m_Camera->getProjectionView() * m_GeoTransform;
 
-	m_GeoShader.bindUniform("Ia", m_AmbientLight);
-	m_GeoShader.bindUniform("Id", m_Light.diffuse);
-	m_GeoShader.bindUniform("Is", m_Light.specular);
-	m_GeoShader.bindUniform("LightDirection", m_Light.direction);
+	//m_GeoShader.bindUniform("Ia", m_AmbientLight);
+	//m_GeoShader.bindUniform("Id", m_Light.diffuse);
+	//m_GeoShader.bindUniform("Is", m_Light.specular);
+	//m_GeoShader.bindUniform("LightDirection", m_Light.direction);
 
-	m_GeoShader.bindUniform("cameraPosition", vec3(glm::inverse(m_Camera->getView())[3]));
-	m_GeoShader.bindUniform("ProjectionViewModel", pvm);
-	m_GeoShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_GeoTransform)));
-	//m_GeoShader.bindUniform("diffuseTexture", 0);	For binding a texture to the GeoShader
+	//m_GeoShader.bindUniform("CameraPosition", vec3(glm::inverse(m_Camera->getView())[3]));
+	//m_GeoShader.bindUniform("ProjectionViewModel", pvm);
+	//m_GeoShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_GeoTransform)));
+	////m_GeoShader.bindUniform("diffuseTexture", 0);	For binding a texture to the GeoShader
 
-	//m_GridTexture.bind(0);	For texture binding
+	////m_GridTexture.bind(0);	For texture binding
 
-	m_GeoMesh.draw();
+	//m_GeoMesh.draw();
 
 	/// Model
 	m_ModelShader.bind();
@@ -180,8 +181,9 @@ void ComputerGraphics::draw()
 	m_ModelShader.bindUniform("LightDirection", m_Light.direction);
 
 	m_ModelShader.bindUniform("ProjectionViewModel", pvm);
-	m_ModelShader.bindUniform("cameraPosition", vec3(glm::inverse(m_Camera->getView())[3]));
-	m_ModelShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_GeoTransform)));
+	m_ModelShader.bindUniform("CameraPosition", vec3(glm::inverse(m_Camera->getView())[3]));
+	m_ModelShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_ModelTransform)));
+	m_ModelShader.bindUniform("DiffuseTexture", 0);
 
 	m_ModelMesh.draw();
 
