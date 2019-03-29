@@ -12,6 +12,7 @@ Camera::~Camera()
 {
 }
 
+// Sets a new projection transform
 void Camera::setPerspective(float fov, float aspectRatio, float n, float f)
 {
 	m_ProjectionTransform = glm::perspective(fov, aspectRatio, n, f);
@@ -19,6 +20,7 @@ void Camera::setPerspective(float fov, float aspectRatio, float n, float f)
 	updateProjectionViewTransform();
 }
 
+// Sets a new view transform
 void Camera::setLookAt(vec3 from, vec3 to, vec3 up)
 {
 	m_ViewTransform = glm::lookAt(from, to, up);
@@ -30,6 +32,7 @@ void Camera::setLookAt(vec3 from, vec3 to, vec3 up)
 	updateProjectionViewTransform();
 }
 
+// Sets the cameras position
 void Camera::setPosition(vec3 pos)
 {
 	m_WorldTransform[3] = vec4(pos, m_WorldTransform[3].w);
@@ -38,6 +41,7 @@ void Camera::setPosition(vec3 pos)
 	updateProjectionViewTransform();
 }
 
+// Updates the PV transform
 void Camera::updateProjectionViewTransform()
 {
 	m_ProjectionViewTransform = m_ProjectionTransform * m_ViewTransform;

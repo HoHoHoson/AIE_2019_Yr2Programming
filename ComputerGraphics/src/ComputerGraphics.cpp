@@ -13,6 +13,7 @@ ComputerGraphics::~ComputerGraphics()
 
 bool ComputerGraphics::startUp()
 {
+	// Creates a GLFW window
 	if (glfwInit() == false)
 		return false;
 
@@ -37,13 +38,17 @@ bool ComputerGraphics::startUp()
 	auto minor = ogl_GetMinorVersion();
 	printf("GL: %i.%i\n", major, minor);
 
+	// Initialises Gizmo limit
 	Gizmos::create(255U, 255U, 65535U, 65535U);
 
+	// Hides cursor
 	glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+	// Creates and initialises a FreeCam
 	m_Camera = new FreeCamera(m_Window, 5.0f);
 	m_Camera->setLookAt(vec3(10, 5, 0), vec3(0), vec3(0, 1, 0));
 
+	// Initialises the two lights
 	m_Light1.direction = vec3(1, 0, 0);
 	m_Light1.diffuse = { 1, 1, 0 };
 	m_Light1.specular = { 1, 1, 0 };
@@ -51,7 +56,7 @@ bool ComputerGraphics::startUp()
 	m_Light2.direction = vec3(0, -1, 0);
 	m_Light2.diffuse = { 1, 1, 0 };
 	m_Light2.specular = { 1, 1, 0 };
-
+	
 	m_AmbientLight = { 0.25f, 0.25f, 0.25f };
 
 	/// Rendering Geometry
@@ -73,7 +78,8 @@ bool ComputerGraphics::startUp()
 	//0,10,0,0,
 	//0,0,10,0,
 	//0,0,0,1
-	//};
+	//};
+
 	//m_GeoMesh.initialiseQuad();
 
 	//Mesh::Vertex cubeVertices[8];
@@ -86,8 +92,13 @@ bool ComputerGraphics::startUp()
 	//cubeVertices[6].position = { -0.5f	, 1.0f	, -0.5f	, 1 };	// Up Bottom-Left
 	//cubeVertices[7].position = { 0.5f	, 1.0f	, -0.5f	, 1 };	// Up Top-Left
 
-	//unsigned int cubeIndices[36] = { 0, 1, 2, 2, 1, 3, 4, 5, 6, 6, 7, 5, 0, 2, 4, 4, 6, 2, 1, 3, 5, 5, 7, 3, 0, 1, 4, 5, 4, 1 , 2, 3, 6, 7, 6, 3 };
-	//m_CubeTransform = mat4(1.0);	//m_CubeTransform = glm::translate(m_CubeTransform, vec3(0, 0, -4));	//m_CubeTransform = glm::scale(m_CubeTransform, vec3(3, 1, 3));	//m_CubeMesh.initialise(8, cubeVertices, 36, cubeIndices);
+	//unsigned int cubeIndices[36] = { 0, 1, 2, 2, 1, 3, 4, 5, 6, 6, 7, 5, 0, 2, 4, 4, 6, 2, 1, 3, 5, 5, 7, 3, 0, 1, 4, 5, 4, 1 , 2, 3, 6, 7, 6, 3 };
+
+	//m_CubeTransform = mat4(1.0);
+	//m_CubeTransform = glm::translate(m_CubeTransform, vec3(0, 0, -4));
+	//m_CubeTransform = glm::scale(m_CubeTransform, vec3(3, 1, 3));
+
+	//m_CubeMesh.initialise(8, cubeVertices, 36, cubeIndices);
 
 	/// Rendering Models
 	m_ModelShader.loadShader(aie::eShaderStage::VERTEX, "../shaders/phong.vert");
@@ -119,12 +130,15 @@ void ComputerGraphics::shutDown()
 
 bool ComputerGraphics::update(float deltaTime)
 {
+	// Application closes on escape key
 	if (glfwWindowShouldClose(m_Window) == true || glfwGetKey(m_Window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		return false;
 
+	// Rotates the model
 	m_ModelTransform = glm::rotate(m_ModelTransform, glm::radians(10.0f) * deltaTime, vec3(0, 0.5f, 0));
-
+	// Rotates m_Light1 around the model
 	m_Light1.direction = vec3(cos(glfwGetTime()), 0, sin(glfwGetTime()));
+
 	m_Camera->update(deltaTime);
 
 	return true;
@@ -139,17 +153,17 @@ void ComputerGraphics::draw()
 	Gizmos::clear();
 
 	/// DRAW BEGIN
-
+	// Draws XYZ axis
 	Gizmos::addTransform(mat4(1));
 
+	// Draws a white, flat and grided plane 
 	vec4 white(1);
-
 	for (int i = 0; i < 21; ++i)
 	{
 		Gizmos::addLine(vec3(-10 + i, 0, 10), vec3(-10 + i, 0, -10), white);
 		Gizmos::addLine(vec3(10, 0, -10 + i), vec3(-10, 0, -10 + i), white);
 	}
-
+	// and an orange sphere
 	Gizmos::addSphere(vec3(0, 0, 0), 1, 10, 10, vec4(0.97f, 0.71f, 0.22f, 0.25f));
 
 	mat4 pvm;
@@ -197,6 +211,7 @@ void ComputerGraphics::draw()
 
 	/// DRAW END
 
-	Gizmos::draw(m_Camera->getProjectionView());	glfwSwapBuffers(m_Window);
+	Gizmos::draw(m_Camera->getProjectionView());
+	glfwSwapBuffers(m_Window);
 	glfwPollEvents();
 }

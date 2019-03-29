@@ -16,3 +16,11 @@ ComputerGraphics/Debug/
 ComputerGraphics/\.vs/
 
 ComputerGraphics/ComputerGraphics/Debug/
+
+ComputerGraphX/\.vs/
+
+ComputerGraphX/Library/
+
+ComputerGraphX/Temp/
+
+ComputerGraphX/obj/
