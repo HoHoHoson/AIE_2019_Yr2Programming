@@ -44,9 +44,13 @@ bool ComputerGraphics::startUp()
 	m_Camera = new FreeCamera(m_Window, 5.0f);
 	m_Camera->setLookAt(vec3(10, 5, 0), vec3(0), vec3(0, 1, 0));
 
-	m_Light.direction = vec3(-1, 0, 0);
-	m_Light.diffuse = { 1, 1, 0 };
-	m_Light.specular = { 1, 1, 0 };
+	m_Light1.direction = vec3(1, 0, 0);
+	m_Light1.diffuse = { 1, 1, 0 };
+	m_Light1.specular = { 1, 1, 0 };
+
+	m_Light2.direction = vec3(0, -1, 0);
+	m_Light2.diffuse = { 1, 1, 0 };
+	m_Light2.specular = { 1, 1, 0 };
 
 	m_AmbientLight = { 0.25f, 0.25f, 0.25f };
 
@@ -118,10 +122,9 @@ bool ComputerGraphics::update(float deltaTime)
 	if (glfwWindowShouldClose(m_Window) == true || glfwGetKey(m_Window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		return false;
 
-	float time = glfwGetTime();
-	
 	m_ModelTransform = glm::rotate(m_ModelTransform, glm::radians(10.0f) * deltaTime, vec3(0, 0.5f, 0));
 
+	m_Light1.direction = vec3(cos(glfwGetTime()), 0, sin(glfwGetTime()));
 	m_Camera->update(deltaTime);
 
 	return true;
@@ -147,7 +150,7 @@ void ComputerGraphics::draw()
 		Gizmos::addLine(vec3(10, 0, -10 + i), vec3(-10, 0, -10 + i), white);
 	}
 
-	Gizmos::addSphere(vec3(0, 0, 0), 1, 10, 10, vec4(0.97f, 0.71f, 0.22f, 0.5f));
+	Gizmos::addSphere(vec3(0, 0, 0), 1, 10, 10, vec4(0.97f, 0.71f, 0.22f, 0.25f));
 
 	mat4 pvm;
 
@@ -176,9 +179,14 @@ void ComputerGraphics::draw()
 	pvm = m_Camera->getProjectionView() * m_ModelTransform;
 
 	m_ModelShader.bindUniform("Ia", m_AmbientLight);
-	m_ModelShader.bindUniform("Id", m_Light.diffuse);
-	m_ModelShader.bindUniform("Is", m_Light.specular);
-	m_ModelShader.bindUniform("LightDirection", m_Light.direction);
+
+	m_ModelShader.bindUniform("Id1", m_Light1.diffuse);
+	m_ModelShader.bindUniform("Is1", m_Light1.specular);
+	m_ModelShader.bindUniform("LightDirection1", m_Light1.direction);
+
+	m_ModelShader.bindUniform("Id2", m_Light2.diffuse);
+	m_ModelShader.bindUniform("Is2", m_Light2.specular);
+	m_ModelShader.bindUniform("LightDirection2", m_Light2.direction);
 
 	m_ModelShader.bindUniform("ProjectionViewModel", pvm);
 	m_ModelShader.bindUniform("CameraPosition", vec3(glm::inverse(m_Camera->getView())[3]));

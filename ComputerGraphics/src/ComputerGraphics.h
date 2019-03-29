@@ -49,6 +49,8 @@ protected:
 		vec3 diffuse;
 		vec3 specular;
 	};
-	Light				m_Light;
+	Light				m_Light1;
+	Light				m_Light2;
+
 	vec3				m_AmbientLight;
 };

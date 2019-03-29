@@ -11,44 +11,50 @@ uniform vec3 Kd;
 uniform vec3 Ks; 
 uniform float specularPower;
 
-struct Light
-{
-	vec3 direction;
-	vec3 diffuse;
-	vec3 specular;
-};
-
-uniform vec3 Ia;
-
-uniform vec3 Id; 
-uniform vec3 Is; 
-uniform vec3 LightDirection;
-
 uniform vec3 CameraPosition;
 uniform sampler2D DiffuseTexture;
 
+uniform vec3 Ia;
+
+uniform vec3 Id1; 
+uniform vec3 Is1; 
+uniform vec3 LightDirection1;
+
+uniform vec3 Id2;
+uniform vec3 Is2;
+uniform vec3 LightDirection2;
+
 out vec4 FragColour;
 
-void main() 
+vec3 CalcDirectLight(in vec3 dir, in vec3 Id, in vec3 Is, in vec3 n, in vec3 v)
 {
-
-	vec3 N = normalize(vNormal);
-	vec3 L = normalize(LightDirection);
-
-	float lambertTerm = max( 0, min( 1, dot( N, -L ) ) );
-
-	vec3 V = normalize(CameraPosition - vPosition.xyz);
-	vec3 R = reflect( L, N );
-
-	float specularTerm = pow( max( 0, dot( R, V ) ), specularPower );
-
+	vec3 L = normalize(dir);
+	
+	float lambertTerm = max( 0, min( 1, dot( n, -L ) ) );
+	
+	vec3 R = reflect( L, n );
+	
+	float specularTerm = pow( max( 0, dot( R, v ) ), specularPower );
+	
 	vec3 ambient = Ia * Ka;
 	vec3 diffuse = Id * Kd * lambertTerm;
 	vec3 specular = Is * Ks * specularTerm;
-	FragColour = vec4( ambient + diffuse + specular, 1) * texture(DiffuseTexture, vTexCoord);
+	
+	vec3 dirLight = (ambient + diffuse + specular);
+	
+	return dirLight;
 }
 
-vec3 CalcDirectLight(in Light light, in vec3 N, )
+void main() 
 {
+	vec3 TotalLight = vec3(0, 0, 0);
+	vec3 N = normalize(vNormal);
+	vec3 V = normalize(CameraPosition - vPosition.xyz);
 
+	TotalLight += CalcDirectLight(LightDirection1, Id1, Is1, N, V);
+	TotalLight += CalcDirectLight(LightDirection2, Id2, Is2, N, V);
+	
+	FragColour = vec4(TotalLight, 1) * texture(DiffuseTexture, vTexCoord);
 }
+
+
