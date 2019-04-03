@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent (typeof(CharacterController))]
+[RequireComponent (typeof(Animator))]
 public class Beta : MonoBehaviour
 {
     CharacterController controller = null;
@@ -24,8 +25,9 @@ public class Beta : MonoBehaviour
         float vertical = Input.GetAxis("Vertical");
         float horizontal = Input.GetAxis("Horizontal");
 
-        controller.SimpleMove(transform.forward * vertical * speed * Time.deltaTime);
+        controller.SimpleMove(transform.forward * Time.deltaTime);
         transform.Rotate(transform.up, horizontal * speed * Time.deltaTime);
+        animator.SetFloat("Speed", vertical * speed * Time.deltaTime);
 	}
 
     private void OnControllerColliderHit(ControllerColliderHit hit)

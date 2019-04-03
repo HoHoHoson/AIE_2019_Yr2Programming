@@ -6,7 +6,19 @@ using UnityEngine;
 public class Ragdoll : MonoBehaviour
 {
     private Animator animator = null;
-    public List<Rigidbody> rigidbodies;
+    private List<Rigidbody> rigidbodies;
+    private Vector3 startPos;
+
+	// Use this for initialization
+	void Start ()
+    {
+        animator = GetComponent<Animator>();
+        rigidbodies = new List<Rigidbody>(GetComponentsInChildren<Rigidbody>());
+        startPos = transform.position;
+
+        foreach (Rigidbody r in rigidbodies)
+            r.isKinematic = true;
+	}
 
     public bool RagdollOn
     {
@@ -20,14 +32,9 @@ public class Ragdoll : MonoBehaviour
         }
     }
 
-	// Use this for initialization
-	void Start ()
+    public void ResetRagdoll()
     {
-        animator = GetComponent<Animator>();
-
-        rigidbodies = new List<Rigidbody>(GetComponentsInChildren<Rigidbody>());
-
-        foreach (Rigidbody r in rigidbodies)
-            r.isKinematic = true;
-	}
+        transform.position = startPos;
+        RagdollOn = false;
+    }
 }

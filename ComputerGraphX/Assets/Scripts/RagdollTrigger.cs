@@ -7,7 +7,17 @@ public class RagdollTrigger : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        Ragdoll ragdoll = other.gameObject.GetComponentInParent<Ragdoll>();
+        ActivateRagdoll(other.gameObject);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        ActivateRagdoll(collision.gameObject);
+    }
+
+    private void ActivateRagdoll(GameObject GO)
+    {
+        Ragdoll ragdoll = GO.GetComponentInParent<Ragdoll>();
 
         if (ragdoll != null)
             ragdoll.RagdollOn = true;
