@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Beta.cs" />
+    <Compile Include="Assets\Scripts\ObjectSelector.cs" />
     <Compile Include="Assets\Scripts\Ragdoll.cs" />
     <Compile Include="Assets\Scripts\RagdollTrigger.cs" />
     <Reference Include="UnityEditor.StandardEvents">
