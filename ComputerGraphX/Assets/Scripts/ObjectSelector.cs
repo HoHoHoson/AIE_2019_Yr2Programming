@@ -8,7 +8,7 @@ public class ObjectSelector : MonoBehaviour
 {
     public Camera mainCam = null;
     public Dropdown dropdown = null;
-    public Material highlightMaterial = null;
+    public ParticleSystem highlightParticle = null;
     public List<Material> materials;
 
     private Renderer selectedObj = null;
@@ -21,8 +21,10 @@ public class ObjectSelector : MonoBehaviour
         for (int i = 0; i < materials.Count; ++i)
             dropdown.options.Add(new Dropdown.OptionData() { text = materials[i].name });
 
-        dropdown.onValueChanged.AddListener(delegate { dropdownChanged(dropdown); });
+        dropdown.onValueChanged.AddListener(delegate { DropdownChanged(dropdown); });
         dropdown.gameObject.SetActive(false);
+
+        highlightParticle.Stop();
     }
 
     private void OnDestroy()
@@ -47,18 +49,28 @@ public class ObjectSelector : MonoBehaviour
 
                 if (selectedObj != null)
                 {
+                    bool matMatch = false;   
                     string matName = selectedObj.material.name.Replace(" (Instance)", "");
-                        
+                    
                     for (int i = 0; i < materials.Count; ++i)
                     {
                         if (materials[i].name == matName)
                         {
                             dropdown.gameObject.SetActive(true);
                             dropdown.value = i;
-                            selectedObj.material = highlightMaterial;
 
+                            highlightParticle.Clear();
+                            highlightParticle.Play();
+
+                            matMatch = true;
                             break;
                         }
+                    }
+
+                    if (matMatch == false)
+                    {
+                        highlightParticle.Stop();
+                        DisableDropdown(dropdown);
                     }
                 }
             }
@@ -66,15 +78,28 @@ public class ObjectSelector : MonoBehaviour
 
         if (selectedObj != null && Input.GetKeyDown(KeyCode.Space))
         {
-            selectedObj.material = materials[dropdown.value];
             selectedObj = null;
 
-            dropdown.gameObject.SetActive(false);
+            highlightParticle.Stop();
+            DisableDropdown(dropdown);
         }
-	}
 
-    private void dropdownChanged(Dropdown dd)
+        if (selectedObj != null && highlightParticle.isPlaying)
+            highlightParticle.transform.position = selectedObj.transform.position;
+    }
+
+    private void DropdownChanged(Dropdown dd)
     {
         selectedObj.material = materials[dd.value];
+    }
+
+    private void DisableDropdown(Dropdown dd)
+    {
+        Transform dropdownBox = dd.transform.Find("Dropdown List");
+
+        if (dropdownBox != null)
+            Destroy(dropdownBox.gameObject);
+
+        dd.gameObject.SetActive(false);
     }
 }
