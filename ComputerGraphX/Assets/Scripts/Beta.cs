@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Class made for the player character
+/// </summary>
 [RequireComponent (typeof(CharacterController))]
 [RequireComponent (typeof(Animator))]
 public class Beta : MonoBehaviour
@@ -30,6 +33,10 @@ public class Beta : MonoBehaviour
         animator.SetFloat("Speed", vertical * speed * Time.deltaTime);
 	}
 
+    /// <summary>
+    /// Moves ragdoll depending on where it was <paramref name="hit"/> from
+    /// </summary>
+    /// <param name="hit"></param>
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         Rigidbody body = hit.collider.attachedRigidbody;

@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Class for enabling and disabling Unity ragdolls. Interacts with the RagdollTrigger class
+/// </summary>
 [RequireComponent(typeof(Animator))]
 public class Ragdoll : MonoBehaviour
 {
@@ -20,6 +23,9 @@ public class Ragdoll : MonoBehaviour
             r.isKinematic = true;
 	}
 
+    /// <summary>
+    /// Enables/Disables the ragdoll by turning the object's animator On/Off and setting it's Rigidbodies isKinematic to False/True
+    /// </summary>
     public bool RagdollOn
     {
         get { return !animator.enabled; }
@@ -32,6 +38,9 @@ public class Ragdoll : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Returns the ragdoll to its initial position from when it was loaded in and turns ragdoll off.
+    /// </summary>
     public void ResetRagdoll()
     {
         transform.position = startPos;

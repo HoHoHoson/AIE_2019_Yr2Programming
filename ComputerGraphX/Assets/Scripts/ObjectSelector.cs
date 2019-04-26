@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+/// <summary>
+/// Class made for highlighting objects and changing their materials via UI and user input
+/// </summary>
 public class ObjectSelector : MonoBehaviour
 {
     public Camera mainCam = null;
@@ -35,6 +38,8 @@ public class ObjectSelector : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
+        // "LeftClick" will select an object if the cursor is over a valid and non UI object
+        // The object will be highlighted with a particle effect
         if (Input.GetKeyDown(KeyCode.Mouse0) && EventSystem.current.IsPointerOverGameObject() == false && mainCam != null)
         {
             RaycastHit hit;
@@ -76,6 +81,7 @@ public class ObjectSelector : MonoBehaviour
             }
         }
 
+        // Deselects the selected object with "Spacebar"
         if (selectedObj != null && Input.GetKeyDown(KeyCode.Space))
         {
             selectedObj = null;
@@ -88,11 +94,19 @@ public class ObjectSelector : MonoBehaviour
             highlightParticle.transform.position = selectedObj.transform.position;
     }
 
+    /// <summary>
+    /// Changes the selected object's material if the dropdown box, <paramref name="dd"/>, has been changed
+    /// </summary>
+    /// <param name="dd"></param>
     private void DropdownChanged(Dropdown dd)
     {
         selectedObj.material = materials[dd.value];
     }
 
+    /// <summary>
+    /// Hides the dropdown box, <paramref name="dd"/>, if no object has been selected
+    /// </summary>
+    /// <param name="dd"></param>
     private void DisableDropdown(Dropdown dd)
     {
         Transform dropdownBox = dd.transform.Find("Dropdown List");

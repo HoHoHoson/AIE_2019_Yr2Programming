@@ -3,6 +3,7 @@
 
 class GLFWwindow;
 
+/* Free Camera class, derived from the Camera class */
 class FreeCamera : public Camera
 {
 public:

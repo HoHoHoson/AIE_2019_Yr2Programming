@@ -15,6 +15,9 @@ using glm::vec4;
 using glm::mat4;
 using aie::Gizmos;
 
+/*
+	my OpenGL computer graphics app
+*/
 class ComputerGraphics
 {
 public:
@@ -43,6 +46,10 @@ protected:
 	aie::OBJMesh		m_ModelMesh;
 	mat4				m_ModelTransform;
 
+	/*
+		Struct that stores the dirrection, diffuse and specular of a directional light.
+		Made for passing into shaders
+	*/
 	struct Light
 	{
 		vec3 direction;
