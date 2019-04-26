@@ -38,6 +38,7 @@ public:
 
 protected:
 
+	// Vertice data
 	unsigned int m_TriCount;
 	unsigned int m_VAO;
 	unsigned int m_VBO;

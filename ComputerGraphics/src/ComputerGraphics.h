@@ -33,22 +33,25 @@ public:
 
 protected:
 
+	// Pointers to GLFWindow and Camera
 	GLFWwindow* m_Window;
 	Camera* m_Camera;
 
 	aie::Texture m_GridTexture;
 
+	// ShaderProgram, Mesh and transform variables for a mesh
 	aie::ShaderProgram	m_GeoShader;
 	Mesh				m_GeoMesh;
 	mat4				m_GeoTransform;
 
+	// ShaderProgram, Mesh and transform variables for a model
 	aie::ShaderProgram	m_ModelShader;
 	aie::OBJMesh		m_ModelMesh;
 	mat4				m_ModelTransform;
 
 	/*
-		Struct that stores the dirrection, diffuse and specular of a directional light.
-		Made for passing into shaders
+		Struct that stores the direction, diffuse and specular of a directional light.
+		Needs to be passed into shaders
 	*/
 	struct Light
 	{
@@ -59,5 +62,6 @@ protected:
 	Light				m_Light1;
 	Light				m_Light2;
 
+	// Vector3 that stores the value of the scenes ambient light
 	vec3				m_AmbientLight;
 };

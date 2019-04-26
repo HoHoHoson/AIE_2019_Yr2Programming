@@ -52,15 +52,19 @@ public:
 
 protected:
 
+	// Stores the reference of the main GLFWindow
 	GLFWwindow* m_CamWindow;
 
+	// The multiple camera transforms
 	mat4 m_WorldTransform;
 	mat4 m_ViewTransform;
 	mat4 m_ProjectionTransform;
 	mat4 m_ProjectionViewTransform;
 
+	// The Yaw and Pitch values
 	float m_Yaw;
 	float m_Pitch;
 
+	/* Updates the projection view transform */
 	void updateProjectionViewTransform();
 };
