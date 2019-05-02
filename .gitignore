@@ -24,3 +24,9 @@ ComputerGraphX/Library/
 ComputerGraphX/Temp/
 
 ComputerGraphX/obj/
+
+ComplexGameSystems/\.vs/
+
+ComplexGameSystems/Debug/
+
+ComplexGameSystems/Multithreading/Debug/
