@@ -35,8 +35,12 @@ public:
 	virtual void drawText(Font* font, const char* text, float xPos, float yPos, float depth = 0.0f);
 
 	// sets the tint colour for all subsequent draw calls
-	void setRenderColour(float r, float g, float b, float a = 1.0f);
-	void setRenderColour(unsigned int colour);
+	void  setRenderColour(float r, float g, float b, float a = 1.0f);
+	void  setRenderColour(unsigned int colour);
+	float getRenderColorR();
+	float getRenderColorG();
+	float getRenderColorB();
+	float getRenderColorA();
 
 	// can be used to set the texture coordinates of sprites using textures
 	// for all subsequent drawSprite calls
