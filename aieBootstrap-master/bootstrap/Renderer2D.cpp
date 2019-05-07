@@ -735,26 +735,6 @@ void Renderer2D::setRenderColour(unsigned int colour) {
 	m_a = ((colour & 0x000000FF) >> 0) / 255.0f;
 }
 
-float Renderer2D::getRenderColorR()
-{
-	return m_r;
-}
-
-float Renderer2D::getRenderColorG()
-{
-	return m_g;
-}
-
-float Renderer2D::getRenderColorB()
-{
-	return m_b;
-}
-
-float Renderer2D::getRenderColorA()
-{
-	return m_a;
-}
-
 void Renderer2D::setUVRect(float uvX, float uvY, float uvW, float uvH) {
 	m_uvX = uvX;
 	m_uvY = uvY;

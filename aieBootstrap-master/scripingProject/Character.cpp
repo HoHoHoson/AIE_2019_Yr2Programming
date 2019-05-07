@@ -84,10 +84,10 @@ void Character::render(aie::Renderer2D* renderer)
 	{
 		float textWidth = m_speechFont->getStringWidth(m_speakingText.c_str());
 		glm::vec4 oldColor = glm::vec4(
-			renderer->getRenderColorR(),
-			renderer->getRenderColorG(),
-			renderer->getRenderColorB(),
-			renderer->getRenderColorA());
+			0,
+			0,
+			0,
+			1);
 		renderer->setRenderColour(m_speechColour.r, m_speechColour.g, m_speechColour.b, m_speechColour.a);
 		
 		renderer->drawText(m_speechFont, m_speakingText.c_str(),

@@ -2,11 +2,13 @@
 
 #include "Application.h"
 #include "Renderer2D.h"
-#include "Audio.h"
 
 
 class Character;
 class ScriptedCharacterController;
+
+class b2World;
+class b2Body;
 
 class ScriptingApplication : public aie::Application {
 public:

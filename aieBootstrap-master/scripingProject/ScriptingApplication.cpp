@@ -52,6 +52,8 @@ void ScriptingApplication::update(float deltaTime)
 
 	m_character->update(deltaTime);
 
+	m_controller->update(deltaTime);
+
 	// input example
 	aie::Input* input = aie::Input::getInstance();
 
