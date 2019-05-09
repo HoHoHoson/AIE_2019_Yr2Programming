@@ -26,5 +26,8 @@
     <ClInclude Include="LuaSoccerTutorialApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BaseLuaObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
