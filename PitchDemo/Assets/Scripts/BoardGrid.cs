@@ -5,18 +5,21 @@ using UnityEngine;
 public class BoardGrid : MonoBehaviour
 {
     public Vector2 boardDimensions;
+    public GameObject tile;
     public float tileRadius;
 
     float tileDiameter;
     int boardSizeX, boardSizeZ;
-    BoardNode[,] nodeArray;
+    public BoardNode[,] nodeArray;
 
 	// Use this for initialization
-	void Start ()
+	void Awake ()
     {
+        boardSizeX = (int)boardDimensions.x;
+        boardSizeZ = (int)boardDimensions.y;
+
+        tileRadius = tile.GetComponentInChildren<MeshRenderer>().bounds.extents.x;
         tileDiameter = tileRadius * 2;
-        boardSizeX = Mathf.RoundToInt(boardDimensions.x / tileDiameter);
-        boardSizeZ = Mathf.RoundToInt(boardDimensions.y / tileDiameter);
 
         createGrid();
 	}
@@ -32,11 +35,35 @@ public class BoardGrid : MonoBehaviour
             {
                 Vector3 nodePos = worldBottomLeftTile + Vector3.right * (x * tileDiameter)
                                                       + Vector3.forward * (z * tileDiameter);
-                nodeArray[x, z] = new BoardNode(nodePos);
+                nodeArray[x, z] = new BoardNode(nodePos, new Vector2(x, z));
             }
+
+        buildBoard();
     }
 
-    private void OnDrawGizmos()
+    public List<BoardNode> getNeighbours(BoardNode node)
+    {
+        List<BoardNode> neighbours = new List<BoardNode>();
+
+        for (int x = -1; x <= 1; ++x)
+            for (int y = -1; y <= 1; ++y)
+            {
+                if (x == 0 && y == 0)
+                    continue;
+
+                int xPos = (int)node.boardPosition.x + x;
+                int yPos = (int)node.boardPosition.y + y;
+
+                if (xPos < 0 || yPos < 0 || xPos >= boardSizeX || yPos >= boardSizeZ)
+                    continue;
+
+                neighbours.Add(nodeArray[xPos, yPos]);
+            }
+
+        return neighbours;
+    }
+
+    private void buildBoard()
     {
         if (nodeArray != null)
         {
@@ -46,8 +73,10 @@ public class BoardGrid : MonoBehaviour
             {
                 for (int x = 0; x < boardSizeX; ++x)
                 {
-                    Gizmos.color = isBlack ? Color.black : Color.white;
-                    Gizmos.DrawCube(nodeArray[x, z].worldPosition, new Vector3(tileDiameter, 0, tileDiameter));
+                    Color colour = isBlack ? Color.black : Color.white;
+                    GameObject tileGO = Instantiate(tile);
+                    tileGO.transform.position = nodeArray[x, z].worldPosition;
+                    tileGO.GetComponentInChildren<Renderer>().material.color = colour;
 
                     isBlack = !isBlack;
                 }
