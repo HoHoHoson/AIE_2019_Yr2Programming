@@ -78,6 +78,9 @@ public class BoardGrid : MonoBehaviour
                     tileGO.transform.position = nodeArray[x, z].worldPosition;
                     tileGO.GetComponentInChildren<Renderer>().material.color = colour;
 
+                    TileData td = tileGO.AddComponent<TileData>();
+                    td.node = nodeArray[x, z];
+
                     isBlack = !isBlack;
                 }
 

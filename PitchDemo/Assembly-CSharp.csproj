@@ -64,6 +64,7 @@
     <Compile Include="Assets\Scripts\BoardGrid.cs" />
     <Compile Include="Assets\Scripts\BoardNode.cs" />
     <Compile Include="Assets\Scripts\GameMaster.cs" />
+    <Compile Include="Assets\Scripts\TileData.cs" />
     <Compile Include="Assets\Scripts\Unit.cs" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Users/Hoson/OneDrive/Documents/GitKraken/AIE_2019_Yr2Programming/PitchDemo/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
