@@ -132,9 +132,16 @@ public class GameMaster : MonoBehaviour
         }
 
         if (selector != null && selectedUnit != null)
-            selector.transform.position = selectedUnit.transform.position;
+        {
+            selector.transform.position = selectedUnit.transform.root.position;
+
+            if (selectedUnit.team == Unit.Team.Green)
+                selector.GetComponent<Renderer>().material.color = Color.green;
+            else
+                selector.GetComponent<Renderer>().material.color = Color.red;
+        }
         else
-            selector.transform.position = transform.position;
+            selector.transform.position = transform.position - Vector3.up * 1;
     }
 
     IEnumerator unitTurns()

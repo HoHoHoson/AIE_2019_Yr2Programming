@@ -1,14 +1,14 @@
 fileFormatVersion: 2
-guid: 20a4f4d9f46dcf24f83bfc274ab6ab51
+guid: 079bb0a6f5014f74cb03303a453c71da
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
     100000: //RootNode
     400000: //RootNode
-    2100000: blackpiece_MAT
+    2100000: lambert1
     2300000: //RootNode
     3300000: //RootNode
-    4300000: blackPiece_GEO13
+    4300000: marker
   externalObjects: {}
   materials:
     importMaterials: 1

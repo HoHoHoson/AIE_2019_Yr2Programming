@@ -17,6 +17,9 @@ public class Unit : MonoBehaviour
     public void setTeam(Team state)
     {
         team = state;
+
+        if (team == Team.Red)
+            transform.LookAt(transform.position - Vector3.forward);
     }
 
 	// Use this for initialization
@@ -64,7 +67,7 @@ public class Unit : MonoBehaviour
 
                 if (n == targetNode)
                 {
-                    moveUnit(currentNode);
+                    moveUnit(currentNode, targetNode);
                     return;
                 }
 
@@ -95,7 +98,7 @@ public class Unit : MonoBehaviour
             return disZ * 14 + (disX - disZ) * 10;
     }
 
-    public void moveUnit(BoardNode pathHead)
+    public void moveUnit(BoardNode pathHead, BoardNode target)
     {
         List<BoardNode> path = new List<BoardNode>();
         BoardNode current = pathHead;
@@ -107,13 +110,18 @@ public class Unit : MonoBehaviour
         }
 
         if (path.Count <= 0)
+        {
+            transform.LookAt(target.worldPosition);
             return;
+        }
 
         path.Reverse();
+
 
         occupiedNode.occupiedUnit = null;
         // Move a node closer to target
         occupiedNode = path[0];
+        transform.LookAt(occupiedNode.worldPosition);
         occupiedNode.occupiedUnit = this;
     }
 
