@@ -1,10 +1,11 @@
-function Start();
+function Initialise();
 end;
 
 function Destroy();
 end;
 
-function Update(deltaTime);
+function Update(delta_time);
+	ApplyRotation(0.1);
 end;
 
 function Draw();

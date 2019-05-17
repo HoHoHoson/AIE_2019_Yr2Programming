@@ -2,9 +2,11 @@
 
 #include "Application.h"
 #include "Renderer2D.h"
+#include <list>
 
 class b2World;
 class b2Body;
+class Agent;
 
 class LuaSoccerTutorialApp : public aie::Application {
 public:
@@ -26,4 +28,6 @@ protected:
 	aie::Texture*		m_ball_texture;
 	b2World*			m_world;
 	b2Body*				m_soccer_ball;
+
+	std::list<Agent*>	m_players;
 };

@@ -2,6 +2,7 @@
 #include "Texture.h"
 #include "Font.h"
 #include "Input.h"
+#include "Agent.h"
 
 #include <Box2D/Box2D.h>
 
@@ -80,6 +81,15 @@ bool LuaSoccerTutorialApp::startup()
 	m_soccer_ball->CreateFixture(&fixture_def);
 	m_soccer_ball->SetLinearVelocity(b2Vec2(10, -15));
 
+	Agent* agent = new Agent(m_world, b2Vec2(100, 100));
+	if (agent->loadScript("../bin/scripts/basicLuaScript.lua") == false)
+	{
+		delete agent;
+		return false;
+	}
+
+	m_players.push_back(agent);
+
 	return true;
 }
 
@@ -109,6 +119,9 @@ void LuaSoccerTutorialApp::update(float deltaTime) {
 	// It is generall best to keep the time step and interations fixed
 	m_world->Step(time_step, velocity_iterations, position_iterations);
 
+	for (auto agent : m_players) 
+		agent->update(deltaTime);
+
 	// exit the application
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
@@ -127,6 +140,9 @@ void LuaSoccerTutorialApp::draw() {
 	float angle = m_soccer_ball->GetAngle();
 
 	m_2dRenderer->drawSprite(m_ball_texture, position.x, position.y, 0, 0, angle);
+
+	for (auto agent : m_players)
+		agent->draw(m_2dRenderer);
 
 	// output some text, uses the last used colour
 	m_2dRenderer->drawText(m_font, "Press ESC to quit", 0, 0);
