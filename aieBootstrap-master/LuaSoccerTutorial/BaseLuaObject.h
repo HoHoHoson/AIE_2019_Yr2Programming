@@ -21,47 +21,51 @@ public:
 	bool loadScript(const char* szPath);
 
 	/*
-		@brief Binds a C++ function to so that it can be called from the Lua script
-		@param
-		@param
+		@brief Binds a C++ function to so that it can be called by the Lua script
+		@param A name that is assigned to the function binded to the script
+		@param The C++ function
 	*/
 	void registerLuaFunction(const char* szFuncName, lua_CFunction fcnFunction);
+
 	/*
-		@brief Calls a Lua function from our C++ code
-		@param
-		@param
+		@brief Calls a function that was added to the Lua stack
+		@param How many function arguements that were added to the stack
+		@param How many results from the function to place onto the Lua stack   
 		@return True if it was successful, else False
 	*/
 	bool callFunction(int argCount, int returnCount);
 
 	/*
-		@brief Passes a pointer to the Lua script
-		@param
-		@param
+		@brief Passes a pointer containing C++ data to the Lua script
+		@param Pointer to the Lua state
+		@param Global name assigned to the pointer
+		@param Pointer to a C++ variable
 	*/
 	static void setPointerVar(lua_State* pState, const char* pVarName, void* vpVal);
+
 	/*
 		@brief Retrieves a pointer from the Lua script
-		@param
-		@param
-		@return
+		@param Pointer to the Lua state
+		@param Global name that was assigned to the pointer
+		@return The variable pointer address
 	*/
 	static void* getPointerVar(lua_State* pState, const char* pVarName);
 
 	/*
 		@brief Pushes a float variable from the C++ script to the Lua stack to be used
-		@param
+		@param Float value
 	*/
 	void pushFloat(float fvalue);
+
 	/*
 		@brief Pops a float variable off the Lua stack
-		@return 
+		@return Float value that was popped off the Lua stack
 	*/
 	float popFloat();
 
 	/*
-		@brief Specifies the function we wish to call on the Lua script
-		@param
+		@brief Pushes onto the Lua stack the value of the global name
+		@param Global name of the function
 	*/
 	void pushFunction(const char* szFunction);
 
