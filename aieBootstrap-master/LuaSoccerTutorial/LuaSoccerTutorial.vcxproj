@@ -177,6 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Agent.h" />
+    <ClInclude Include="b2UserData.h" />
     <ClInclude Include="BaseLuaObject.h" />
     <ClInclude Include="LuaSoccerTutorialApp.h" />
   </ItemGroup>

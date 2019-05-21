@@ -3,11 +3,12 @@
 #include "Font.h"
 #include "Input.h"
 #include "Agent.h"
+#include "b2UserData.h"
 
 #include <Box2D/Box2D.h>
 
-LuaSoccerTutorialApp::LuaSoccerTutorialApp() {
-
+LuaSoccerTutorialApp::LuaSoccerTutorialApp() : m_is_gameover(false)
+{
 }
 
 LuaSoccerTutorialApp::~LuaSoccerTutorialApp() {
@@ -59,6 +60,25 @@ bool LuaSoccerTutorialApp::startup()
 		ground->CreateFixture(&sd);
 	}
 
+	// Left goal
+	{
+		b2BodyDef bd;
+		bd.position.Set(100.0f, 360.0f);
+		m_left_goal = m_world->CreateBody(&bd);
+
+		b2EdgeShape shape;
+		b2FixtureDef sd;
+		sd.shape = &shape;
+		sd.density = 0.0f;
+		sd.restitution = k_restitution;
+
+		// Left vertical
+		shape.Set(b2Vec2(0.0f, -50.0f), b2Vec2(0.0f, 50.0f));
+
+		m_left_goal->CreateFixture(&sd);
+		m_left_goal->SetUserData(new b2UserData(GOAL));
+	}
+
 	// Create a dynamic body for the soccer ball
 	b2BodyDef body_def;
 	body_def.type = b2_dynamicBody;
@@ -80,6 +100,7 @@ bool LuaSoccerTutorialApp::startup()
 	// Attach shape to the object
 	m_soccer_ball->CreateFixture(&fixture_def);
 	m_soccer_ball->SetLinearVelocity(b2Vec2(10, -15));
+	m_soccer_ball->SetUserData(new b2UserData(EntityType::BALL));
 
 	Agent* agent = new Agent(m_world, b2Vec2(100, 100));
 	if (agent->loadScript("../bin/scripts/basicLuaScript.lua") == false)
@@ -88,6 +109,7 @@ bool LuaSoccerTutorialApp::startup()
 		return false;
 	}
 
+	agent->m_b2_body->SetUserData(new b2UserData(EntityType::AGENT, (void*)agent));
 	m_players.push_back(agent);
 
 	return true;
@@ -143,6 +165,16 @@ void LuaSoccerTutorialApp::draw() {
 
 	for (auto agent : m_players)
 		agent->draw(m_2dRenderer);
+
+	position = m_left_goal->GetPosition();
+	m_2dRenderer->setRenderColour(1, 0, 0, 1);
+	m_2dRenderer->drawSprite(nullptr, position.x, position.y, 10, 100);
+	m_2dRenderer->setRenderColour(1, 1, 1, 1);
+
+	if (m_is_gameover) 
+	{
+		m_2dRenderer->drawText(m_font, "Gooooooooooooooooooooal!!!1", 200, 700);
+	}
 
 	// output some text, uses the last used colour
 	m_2dRenderer->drawText(m_font, "Press ESC to quit", 0, 0);

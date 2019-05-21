@@ -28,6 +28,8 @@ protected:
 	aie::Texture*		m_ball_texture;
 	b2World*			m_world;
 	b2Body*				m_soccer_ball;
-
+	b2Body*				m_left_goal;
 	std::list<Agent*>	m_players;
+
+	bool				m_is_gameover;
 };

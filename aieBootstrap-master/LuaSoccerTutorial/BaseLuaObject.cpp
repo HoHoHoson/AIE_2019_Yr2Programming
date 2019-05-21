@@ -3,7 +3,9 @@
 
 BaseLuaObject::BaseLuaObject()
 {
+	// Create a new Lua state
 	m_pLua_state = luaL_newstate();
+	// Loading in the default Lua libraries
 	luaL_openlibs(m_pLua_state);
 
 	setPointerVar(m_pLua_state, "self", this);
