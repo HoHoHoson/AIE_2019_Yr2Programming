@@ -171,12 +171,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Agent.cpp" />
+    <ClCompile Include="b2ContactListener.cpp" />
     <ClCompile Include="BaseLuaObject.cpp" />
     <ClCompile Include="LuaSoccerTutorialApp.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Agent.h" />
+    <ClInclude Include="b2ContactListener.h" />
     <ClInclude Include="b2UserData.h" />
     <ClInclude Include="BaseLuaObject.h" />
     <ClInclude Include="LuaSoccerTutorialApp.h" />
