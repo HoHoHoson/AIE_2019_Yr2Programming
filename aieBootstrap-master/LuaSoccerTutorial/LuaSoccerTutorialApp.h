@@ -2,16 +2,21 @@
 
 #include "Application.h"
 #include "Renderer2D.h"
+#include "Agent.h"
 #include <list>
 
 class b2World;
 class b2Body;
 class Agent;
+class MyContactListener;
 
-class LuaSoccerTutorialApp : public aie::Application {
+class LuaSoccerTutorialApp : public aie::Application 
+{
+	static LuaSoccerTutorialApp* m_pInstance;
+	LuaSoccerTutorialApp();
+
 public:
 
-	LuaSoccerTutorialApp();
 	virtual ~LuaSoccerTutorialApp();
 
 	virtual bool startup();
@@ -19,6 +24,12 @@ public:
 
 	virtual void update(float deltaTime);
 	virtual void draw();
+
+	void doBallHit(void* otherObjData);
+
+	static LuaSoccerTutorialApp* instance();
+	static int luaGetBallPosition(lua_State* pState);
+	static int luaGetGoalPosition(lua_State* pState);
 
 protected:
 
@@ -32,4 +43,6 @@ protected:
 	std::list<Agent*>	m_players;
 
 	bool				m_is_gameover;
+
+	MyContactListener* m_listener_instance;
 };

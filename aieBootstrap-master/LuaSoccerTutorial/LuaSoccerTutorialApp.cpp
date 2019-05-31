@@ -2,17 +2,20 @@
 #include "Texture.h"
 #include "Font.h"
 #include "Input.h"
-#include "Agent.h"
 #include "b2UserData.h"
+#include "b2ContactListener.h"
 
+#include <iostream>
 #include <Box2D/Box2D.h>
 
 LuaSoccerTutorialApp::LuaSoccerTutorialApp() : m_is_gameover(false)
 {
 }
 
-LuaSoccerTutorialApp::~LuaSoccerTutorialApp() {
+LuaSoccerTutorialApp* LuaSoccerTutorialApp::m_pInstance = nullptr;
 
+LuaSoccerTutorialApp::~LuaSoccerTutorialApp() 
+{
 }
 
 bool LuaSoccerTutorialApp::startup() 
@@ -27,6 +30,9 @@ bool LuaSoccerTutorialApp::startup()
 
 	b2Vec2 gravity(0.0f, 0.0f);
 	m_world = new b2World(gravity);
+
+	m_listener_instance = new MyContactListener();
+	m_world->SetContactListener(m_listener_instance);
 
 	const float32 k_restitution = 0.4f;
 
@@ -85,13 +91,13 @@ bool LuaSoccerTutorialApp::startup()
 	body_def.position.Set(640.0f, 360.0f);
 	m_soccer_ball = m_world->CreateBody(&body_def);
 
-	// Define shape for the soccer ball, in this case, a box
-	b2PolygonShape dynamic_box;
-	dynamic_box.SetAsBox(24.0f, 24.0f);
+	// Define shape for the soccer ball
+	b2CircleShape dynamic_circle;
+	dynamic_circle.m_radius = 24.0f;
 
 	// Define dynamic body fixture
 	b2FixtureDef fixture_def;
-	fixture_def.shape = &dynamic_box;
+	fixture_def.shape = &dynamic_circle;
 	// Set box density to non zero, so it'll be dynamic
 	fixture_def.density = 1.0f;
 	// Friction value
@@ -99,7 +105,7 @@ bool LuaSoccerTutorialApp::startup()
 
 	// Attach shape to the object
 	m_soccer_ball->CreateFixture(&fixture_def);
-	m_soccer_ball->SetLinearVelocity(b2Vec2(10, -15));
+	m_soccer_ball->SetLinearVelocity(b2Vec2(-20, 0));
 	m_soccer_ball->SetUserData(new b2UserData(EntityType::BALL));
 
 	Agent* agent = new Agent(m_world, b2Vec2(100, 100));
@@ -173,7 +179,7 @@ void LuaSoccerTutorialApp::draw() {
 
 	if (m_is_gameover) 
 	{
-		m_2dRenderer->drawText(m_font, "Gooooooooooooooooooooal!!!1", 200, 700);
+		m_2dRenderer->drawText(m_font, "Gooooooooooooooooooooal!!!", 200, 700);
 	}
 
 	// output some text, uses the last used colour
@@ -181,4 +187,64 @@ void LuaSoccerTutorialApp::draw() {
 
 	// done drawing sprites
 	m_2dRenderer->end();
+}
+
+LuaSoccerTutorialApp * LuaSoccerTutorialApp::instance()
+{
+	if (m_pInstance == nullptr)
+		m_pInstance = new LuaSoccerTutorialApp();
+
+	return m_pInstance;
+}
+
+int LuaSoccerTutorialApp::luaGetBallPosition(lua_State * pState)
+{
+	int n = lua_gettop(pState);
+	if (n != 0) 
+	{
+		std::cout << "invalid arguments to function _lua_GetBallPosition"
+			<< std::endl;
+		return 0;
+	}
+
+	b2Vec2 pos = m_pInstance->m_soccer_ball->GetPosition();
+	lua_pushnumber(pState, pos.x);
+	lua_pushnumber(pState, pos.y);
+
+	// tell lua how many return values
+	return 2;
+}
+
+int LuaSoccerTutorialApp::luaGetGoalPosition(lua_State * pState)
+{
+	int n = lua_gettop(pState);
+	if (n != 0) 
+	{
+		std::cout << "invalid arguments to function _lua_GetGoalPosition"
+			<< std::endl;
+		return 0;
+	}
+
+	b2Vec2 pos = m_pInstance->m_left_goal->GetPosition();
+	lua_pushnumber(pState, pos.x);
+	lua_pushnumber(pState, pos.y);
+
+	// tell lua how many return values
+	return 2;
+}
+
+void LuaSoccerTutorialApp::doBallHit(void * otherObjData)
+{
+	if (otherObjData)
+	{
+		b2UserData* data = static_cast<b2UserData*>(otherObjData);
+
+		if (data->entity_type == GOAL)
+			m_is_gameover = true;
+		else if (data->entity_type == AGENT)
+		{
+			Agent* agent = static_cast<Agent*>(data->data);
+			agent->onCollision(m_soccer_ball->GetPosition());
+		}
+	}
 }

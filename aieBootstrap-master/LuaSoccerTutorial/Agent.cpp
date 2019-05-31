@@ -1,5 +1,6 @@
 #include "Agent.h"
 #include "b2UserData.h"
+#include "LuaSoccerTutorialApp.h"
 #include <Texture.h>
 #include <Renderer2D.h>
 
@@ -26,6 +27,11 @@ Agent::Agent(b2World * pWorld, b2Vec2 position)
 	registerLuaFunction("GetPosition", luaGetPosition);
 	registerLuaFunction("ApplyForce", luaApplyForce);
 	registerLuaFunction("ApplyRotation", luaApplyRotation);
+	registerLuaFunction("GetAngle", luaGetAngle);
+	registerLuaFunction("GetBallPosition",
+		LuaSoccerTutorialApp::luaGetBallPosition);
+	registerLuaFunction("GetGoalPosition",
+		LuaSoccerTutorialApp::luaGetGoalPosition);
 }
 
 int Agent::luaGetPosition(lua_State* pState)
@@ -60,6 +66,16 @@ int Agent::luaApplyRotation(lua_State* pState)
 	return 0;
 }
 
+int Agent::luaGetAngle(lua_State * pState)
+{
+	Agent* agent = static_cast<Agent*>(getPointerVar(pState, "self"));
+
+	float angle = agent->m_b2_body->GetAngle();
+	agent->pushFloat(angle);
+
+	return 1;
+}
+
 void Agent::applyForce(const b2Vec2& force)
 {
 	m_b2_body->SetLinearVelocity(force);
@@ -68,6 +84,15 @@ void Agent::applyForce(const b2Vec2& force)
 void Agent::applyRotation(const float force)
 {
 	m_b2_body->SetAngularVelocity(force);
+}
+
+void Agent::onCollision(b2Vec2 otherPosition)
+{
+	pushFunction("OnCollision");
+	pushFloat(otherPosition.x);
+	pushFloat(otherPosition.y);
+
+	callFunction(2, 0);
 }
 
 void Agent::update(float dt)
