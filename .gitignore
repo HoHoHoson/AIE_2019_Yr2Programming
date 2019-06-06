@@ -40,3 +40,13 @@ PitchDemo/Library/
 PitchDemo/\.vs/
 
 PitchDemo/obj/
+
+Complex_Systems/\.vs/
+
+Complex_Systems/Debug/
+
+Complex_Systems/Lua_Binder/Debug/
+
+Complex_Systems/Lua_Binder/x64/
+
+Complex_Systems/Lua_Lib/temp/
