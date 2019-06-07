@@ -31,6 +31,18 @@ public:
 	void printError(const std::string& variableName, const std::string& reason);
 
 	/*
+		Clears the Lua stack
+	*/
+	void luaClearStack();
+
+	/*
+	@brief Places a Lua variable on top of the Lua stack
+	@param Global name, [variableName], assigned to variable
+	@returns True on success, False otherwise
+*/
+	bool luaGetToStack(const std::string& variableName);
+
+	/*
 		@brief Gets a variable from the Lua script
 		@param Variable wanted from the script
 		@return The intended variable, default if failed
@@ -51,16 +63,9 @@ public:
 		else
 			result = luaGetDefault<T>(); // Gets the default value of the variable if it fails
 
-		lua_pop(m_L, m_level); // Clear Lua stack after finished
+		luaClearStack();
 		return result;
 	}
-
-	/*
-		@brief Places a Lua variable on top of the Lua stack
-		@param Global name, [variableName], assigned to variable
-		@returns True on success, False otherwise
-	*/
-	bool luaGetToStack(const std::string& variableName);
 
 	/*
 		@brief Gets the variable on top of the Lua stack
@@ -81,8 +86,6 @@ public:
 private:
 
 	lua_State* m_L;
-
-	int m_level; // Keeps track of the depth of the current variable and the number of objects on the Lua stack
 };
 
 

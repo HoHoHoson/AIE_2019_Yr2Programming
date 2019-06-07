@@ -25,9 +25,16 @@ void LuaScript::printError(const std::string & variableName, const std::string &
 	std::cout << "Error: Can't get [" << variableName << "]. " << reason << std::endl;
 }
 
+void LuaScript::luaClearStack()
+{
+	int stack_count = lua_gettop(m_L);
+
+	lua_pop(m_L, stack_count);
+}
+
 bool LuaScript::luaGetToStack(const std::string & variableName)
 {
-	m_level = 0;
+	bool is_global = true;
 	std::string var = "";
 
 	// Cycles through each variable in variable path [variableName] and checks if they're valid
@@ -39,12 +46,13 @@ bool LuaScript::luaGetToStack(const std::string & variableName)
 		}
 		else
 		{
-			if (m_level == 0)
+			if (is_global)
+			{
 				lua_getglobal(m_L, var.c_str()); // Gets the Lua global, [var] and places it on top of the Lua stack
+				is_global = false;
+			}
 			else
 				lua_getfield(m_L, -1, var.c_str()); // Gets the field variable, [var] of the variable on top of the Lua stack, and places it on top of the stack
-
-				++m_level;
 
 			if (lua_isnil(m_L, -1)) // Check if pushed variable was valid
 			{
@@ -57,12 +65,10 @@ bool LuaScript::luaGetToStack(const std::string & variableName)
 	}
 
 	// Repeat the check once more due to the for loop only checking when there is  a '.'
-	if (m_level == 0)
+	if (is_global)
 		lua_getglobal(m_L, var.c_str());
 	else
 		lua_getfield(m_L, -1, var.c_str()); 
-
-	++m_level;
 
 	if (lua_isnil(m_L, -1))
 	{
