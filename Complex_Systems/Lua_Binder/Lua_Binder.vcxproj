@@ -21,6 +21,10 @@
   <ItemGroup>
     <ClInclude Include="LuaScript.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="LuaScript.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{430C6247-B3F3-42BC-9990-20451CD5B1B8}</ProjectGuid>
