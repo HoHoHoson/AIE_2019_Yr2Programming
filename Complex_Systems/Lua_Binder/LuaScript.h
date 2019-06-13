@@ -49,6 +49,11 @@ public:
 		return result;
 	}
 
+	/*
+		@brief Gets an array from the Lua script
+		@param Name of the array in the Lua script
+		@return The specified array if it succeeds, otherwise, an empty array 
+	*/
 	template<typename T>
 	std::vector<T> getVector(const std::string& vectorName)
 	{
@@ -62,24 +67,25 @@ public:
 
 		if (luaGetToStack(vectorName))
 		{
-			unsigned int vector_index = 0;
-
 			lua_pushnil(m_L);
-			while (lua_next(m_L, -2))
+			// Stack should now contain the array and a nil value, marks the start of the array for lua_next
+			unsigned int vector_index = 0; // Keep track of iteration for troubleshooting
+			while (lua_next(m_L, -2)) // Takes in the array and current key, pops off the key and pushes on the next key and it's value, returns 0 when at the end
 			{
-				std::string value_name = vectorName + "[" + std::to_string(vector_index) + "]";
-				T value = luaGet<T>(value_name);
+				std::string value_desc = vectorName + "[" + std::to_string(vector_index) + "]";
+				T value = luaGet<T>(value_desc);
 
-				if (value == luaGetDefault<T>())
+				if (value == luaGetDefault<T>()) // Checks for type mismatches
 				{
-					printError(value_name, "the variable type doesn't match vector type");
+					printError(value_desc, "the variable type doesn't match vector type");
 					vector.clear();
 					break;
 				}
 
+				vector.push_back(value); // Adds the gotten value to our vector
 				++vector_index;
-				vector.push_back(value);
-				lua_pop(m_L, 1);
+
+				lua_pop(m_L, 1); // Pops off the recorded value, only the array and table key is left. Therefore it is now ready for the next iteration
 			}
 		}
 
@@ -91,7 +97,7 @@ private:
 
 	/*
 		@brief Custom error printer
-		@param Prints an error message that tells how [variableName]
+		@param The name/description of the variable
 		@param was not returned due to [reason]
 	*/
 	void printError(const std::string& variableName, const std::string& reason);
