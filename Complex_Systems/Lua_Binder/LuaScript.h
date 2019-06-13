@@ -1,6 +1,7 @@
 #ifndef LUASCRIPT_H
 #define LUASCRIPT_H
 
+#include <vector>
 #include <string>
 #include <iostream>
 
@@ -24,25 +25,6 @@ public:
 	~LuaScript();
 
 	/*
-		@brief Custom error printer
-		@param Prints an error message that tells how [variableName]
-		@param was not returned due to [reason]
-	*/
-	void printError(const std::string& variableName, const std::string& reason);
-
-	/*
-		Clears the Lua stack
-	*/
-	void luaClearStack();
-
-	/*
-	@brief Places a Lua variable on top of the Lua stack
-	@param Global name, [variableName], assigned to variable
-	@returns True on success, False otherwise
-*/
-	bool luaGetToStack(const std::string& variableName);
-
-	/*
 		@brief Gets a variable from the Lua script
 		@param Variable wanted from the script
 		@return The intended variable, default if failed
@@ -52,7 +34,7 @@ public:
 	{
 		if (m_L == nullptr)
 		{
-			printError(variableName, "Script is not loaded.");
+			printError(variableName, "script is not loaded.");
 			return luaGetDefault<T>();
 		}
 
@@ -67,10 +49,69 @@ public:
 		return result;
 	}
 
+	template<typename T>
+	std::vector<T> getVector(const std::string& vectorName)
+	{
+		std::vector<T> vector;
+
+		if (m_L == nullptr)
+		{
+			printError(vectorName, "script is not loaded.");
+			return vector;
+		}
+
+		if (luaGetToStack(vectorName))
+		{
+			unsigned int vector_index = 0;
+
+			lua_pushnil(m_L);
+			while (lua_next(m_L, -2))
+			{
+				std::string value_name = vectorName + "[" + std::to_string(vector_index) + "]";
+				T value = luaGet<T>(value_name);
+
+				if (value == luaGetDefault<T>())
+				{
+					printError(value_name, "the variable type doesn't match vector type");
+					vector.clear();
+					break;
+				}
+
+				++vector_index;
+				vector.push_back(value);
+				lua_pop(m_L, 1);
+			}
+		}
+
+		luaClearStack();
+		return vector;
+	}
+
+private:
+
 	/*
-		@brief Gets the variable on top of the Lua stack
-		@param Name of the Lua script variable
-		@returns The intended variable or default of variable type if failed
+		@brief Custom error printer
+		@param Prints an error message that tells how [variableName]
+		@param was not returned due to [reason]
+	*/
+	void printError(const std::string& variableName, const std::string& reason);
+
+	/*
+		Clears the Lua stack, should be done at the end of a function that is done with the Lua stack
+	*/
+	void luaClearStack();
+
+	/*
+	@brief Places a Lua variable on top of the Lua stack
+	@param Global name, [variableName], assigned to variable
+	@returns True on success, False otherwise
+*/
+	bool luaGetToStack(const std::string& variableName);
+
+	/*
+		@brief Checks and gets the variable on top of the Lua stack
+		@param Name/Description of the Lua variable
+		@returns Either the top stack variable or if it fails, the default value for the variable type
 	*/
 	template<typename T>
 	T luaGet(const std::string& variableName) { return 0; }
@@ -83,12 +124,8 @@ public:
 	template<typename T>
 	T luaGetDefault() { return 0; }
 
-private:
-
 	lua_State* m_L;
 };
-
-
 
 template<>
 inline std::string LuaScript::luaGetDefault()
@@ -96,8 +133,7 @@ inline std::string LuaScript::luaGetDefault()
 	return "null";
 }
 
-
-
+// luaGet templates
 template<>
 inline bool LuaScript::luaGet(const std::string& variableName)
 {
@@ -108,7 +144,7 @@ template<>
 inline int LuaScript::luaGet(const std::string& variableName)
 {
 	if (lua_isnumber(m_L, -1) == false)
-		printError(variableName, "Not a number.");
+		printError(variableName, "not a number.");
 
 	return (int)lua_tonumber(m_L, -1);
 }
@@ -117,7 +153,7 @@ template<>
 inline float LuaScript::luaGet(const std::string& variableName)
 {
 	if (lua_isnumber(m_L, -1) == false)
-		printError(variableName, "Not a number.");
+		printError(variableName, "not a number.");
 
 	return (float)lua_tonumber(m_L, -1);
 }
@@ -128,7 +164,7 @@ inline std::string LuaScript::luaGet(const std::string& variableName)
 	std::string str = "null";
 
 	if (lua_isstring(m_L, -1) == false)
-		printError(variableName, "Not a string.");
+		printError(variableName, "not a string.");
 	else
 		str = lua_tostring(m_L, -1);
 
@@ -136,5 +172,5 @@ inline std::string LuaScript::luaGet(const std::string& variableName)
 }
 
 
-
 #endif // !LUASCRIPT_H
+

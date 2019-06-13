@@ -22,7 +22,7 @@ LuaScript::~LuaScript()
 
 void LuaScript::printError(const std::string & variableName, const std::string & reason)
 {
-	std::cout << "Error: Can't get [" << variableName << "]. " << reason << std::endl;
+	std::cout << "Error: Can't get (" << variableName << "), " << reason << std::endl;
 }
 
 void LuaScript::luaClearStack()
