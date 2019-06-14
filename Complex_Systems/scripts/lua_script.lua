@@ -4,6 +4,7 @@ struct =
 	words = "this is a string";
 	tab = { inside = 11; };
 	intvector = {"s", "t", "r", "i", "n", "g", 69};
+	69
 };
 
 function sum(x, y)

@@ -38,5 +38,8 @@ int main()
 
 	sum(lua_script, 6, 9);
 
+	for (std::string s : lua_script.getTableKeys("struct"))
+		std::cout << s << std::endl;
+
 	return 0;
 }

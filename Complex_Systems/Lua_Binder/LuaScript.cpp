@@ -37,7 +37,15 @@ std::vector<std::string> LuaScript::getTableKeys(const std::string & table_name)
 
 	// GET TABLE
 	if (luaGetToStack(table_name))
-		if (lua_gettable(m_L, -1))
+	{
+		lua_pushnil(m_L);
+		
+		while (lua_next(m_L, -2))
+		{
+			lua_pop(m_L, 1);
+			vec.push_back(lua_tostring(m_L, -1));
+		}
+	}
 
 	return vec;
 }
