@@ -3,7 +3,10 @@
 void sum(LuaScript& script, int x, int y)
 {
 	if (script.isNull())
+	{
 		std::cout << "Script not loaded." << std::endl;
+		return;
+	}
 
 	std::string func_name = "sum";
 

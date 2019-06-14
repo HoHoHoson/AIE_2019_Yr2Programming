@@ -11,6 +11,8 @@ LuaScript::LuaScript(const std::string & filename)
 
 		m_L = nullptr;
 	}
+	else
+		luaL_openlibs(m_L);
 }
 
 LuaScript::~LuaScript()
@@ -35,11 +37,10 @@ std::vector<std::string> LuaScript::getTableKeys(const std::string & table_name)
 		return vec;
 	}
 
-	// GET TABLE
 	if (luaGetToStack(table_name))
 	{
 		lua_pushnil(m_L);
-		
+
 		while (lua_next(m_L, -2))
 		{
 			lua_pop(m_L, 1);
@@ -47,6 +48,7 @@ std::vector<std::string> LuaScript::getTableKeys(const std::string & table_name)
 		}
 	}
 
+	luaClearStack();
 	return vec;
 }
 
