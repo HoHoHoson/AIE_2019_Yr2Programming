@@ -24,30 +24,21 @@ public:
 	LuaScript(const std::string& filename);
 	~LuaScript();
 
+	lua_State* state() { return m_L; }
+
+	/*
+		@brief Checks if the lua_State is nullptr
+		@returns True if so, False otherwise
+	*/
+	bool isNull();
+
 	/*
 		@brief Gets a variable from the Lua script
 		@param Variable wanted from the script
 		@return The intended variable, default if failed
 	*/
 	template<typename T>
-	T get(const std::string& variableName) 
-	{
-		if (m_L == nullptr)
-		{
-			printError(variableName, "script is not loaded.");
-			return luaGetDefault<T>();
-		}
-
-		T result;
-
-		if (luaGetToStack(variableName)) // Checks to see if variable exists, places it on stack if it does
-			result = luaGet<T>(variableName); // Gets the variable on the top of the stack
-		else
-			result = luaGetDefault<T>(); // Gets the default value of the variable if it fails
-
-		luaClearStack();
-		return result;
-	}
+	T get(const std::string& variable_name);
 
 	/*
 		@brief Gets an array from the Lua script
@@ -55,43 +46,14 @@ public:
 		@return The specified array if it succeeds, otherwise, an empty array 
 	*/
 	template<typename T>
-	std::vector<T> getVector(const std::string& vectorName)
-	{
-		std::vector<T> vector;
+	std::vector<T> getVector(const std::string& vector_name);
 
-		if (m_L == nullptr)
-		{
-			printError(vectorName, "script is not loaded.");
-			return vector;
-		}
-
-		if (luaGetToStack(vectorName))
-		{
-			lua_pushnil(m_L);
-			// Stack should now contain the array and a nil value, marks the start of the array for lua_next
-			unsigned int vector_index = 0; // Keep track of iteration for troubleshooting
-			while (lua_next(m_L, -2)) // Takes in the array and current key, pops off the key and pushes on the next key and it's value, returns 0 when at the end
-			{
-				std::string value_desc = vectorName + "[" + std::to_string(vector_index) + "]";
-				T value = luaGet<T>(value_desc);
-
-				if (value == luaGetDefault<T>()) // Checks for type mismatches
-				{
-					printError(value_desc, "the variable type doesn't match vector type");
-					vector.clear();
-					break;
-				}
-
-				vector.push_back(value); // Adds the gotten value to our vector
-				++vector_index;
-
-				lua_pop(m_L, 1); // Pops off the recorded value, only the array and table key is left. Therefore it is now ready for the next iteration
-			}
-		}
-
-		luaClearStack();
-		return vector;
-	}
+	/*
+		@brief Gets all the keys of the variables in 
+		@param [table_name] and
+		@return in a vector of string format
+	*/
+	std::vector<std::string> getTableKeys(const std::string& table_name);
 
 private:
 
@@ -100,7 +62,7 @@ private:
 		@param The name/description of the variable
 		@param was not returned due to [reason]
 	*/
-	void printError(const std::string& variableName, const std::string& reason);
+	void printError(const std::string& variable_name, const std::string& reason);
 
 	/*
 		Clears the Lua stack, should be done at the end of a function that is done with the Lua stack
@@ -112,7 +74,7 @@ private:
 	@param Global name, [variableName], assigned to variable
 	@returns True on success, False otherwise
 */
-	bool luaGetToStack(const std::string& variableName);
+	bool luaGetToStack(const std::string& variable_name);
 
 	/*
 		@brief Checks and gets the variable on top of the Lua stack
@@ -120,7 +82,7 @@ private:
 		@returns Either the top stack variable or if it fails, the default value for the variable type
 	*/
 	template<typename T>
-	T luaGet(const std::string& variableName) { return 0; }
+	T luaGet(const std::string& variable_name) { return 0; }
 
 	/*
 		@brief Gets the default value
@@ -141,36 +103,36 @@ inline std::string LuaScript::luaGetDefault()
 
 // luaGet templates
 template<>
-inline bool LuaScript::luaGet(const std::string& variableName)
+inline bool LuaScript::luaGet(const std::string& variable_name)
 {
 	return (bool)lua_toboolean(m_L, -1);
 }
 
 template<>
-inline int LuaScript::luaGet(const std::string& variableName)
+inline int LuaScript::luaGet(const std::string& variable_name)
 {
 	if (lua_isnumber(m_L, -1) == false)
-		printError(variableName, "not a number.");
+		printError(variable_name, "not an int");
 
 	return (int)lua_tonumber(m_L, -1);
 }
 
 template<>
-inline float LuaScript::luaGet(const std::string& variableName)
+inline float LuaScript::luaGet(const std::string& variable_name)
 {
 	if (lua_isnumber(m_L, -1) == false)
-		printError(variableName, "not a number.");
+		printError(variable_name, "not a float");
 
 	return (float)lua_tonumber(m_L, -1);
 }
 
 template<>
-inline std::string LuaScript::luaGet(const std::string& variableName)
+inline std::string LuaScript::luaGet(const std::string& variable_name)
 {
 	std::string str = "null";
 
 	if (lua_isstring(m_L, -1) == false)
-		printError(variableName, "not a string.");
+		printError(variable_name, "not a string");
 	else
 		str = lua_tostring(m_L, -1);
 
@@ -178,5 +140,65 @@ inline std::string LuaScript::luaGet(const std::string& variableName)
 }
 
 
-#endif // !LUASCRIPT_H
+template<typename T>
+inline T LuaScript::get(const std::string & variable_name)
+{
+	if (isNull())
+	{
+		printError(variable_name, "script is not loaded");
+		return luaGetDefault<T>();
+	}
 
+	T result;
+
+	if (luaGetToStack(variable_name)) // Checks to see if variable exists, places it on stack if it does
+		result = luaGet<T>(variable_name); // Gets the variable on the top of the stack
+	else
+		result = luaGetDefault<T>(); // Gets the default value of the variable if it fails
+
+	luaClearStack();
+	return result;
+}
+
+
+template<typename T>
+inline std::vector<T> LuaScript::getVector(const std::string & vector_name)
+{
+	std::vector<T> vector;
+
+	if (isNull())
+	{
+		printError(vector_name, "script is not loaded");
+		return vector;
+	}
+
+	if (luaGetToStack(vector_name))
+	{
+		lua_pushnil(m_L);
+		// Stack should now contain the array and a nil value, marks the start of the array for lua_next
+		unsigned int vector_index = 0; // Keep track of iteration for troubleshooting
+		while (lua_next(m_L, -2)) // Takes in the array and current key, pops off the key and pushes on the next key and it's value, returns 0 when at the end
+		{
+			std::string value_desc = vector_name + "[" + std::to_string(vector_index) + "]";
+			T value = luaGet<T>(value_desc);
+
+			if (value == luaGetDefault<T>()) // Checks for type mismatches
+			{
+				printError(value_desc, "the variable type doesn't match vector type");
+				vector.clear();
+				break;
+			}
+
+			vector.push_back(value); // Adds the gotten value to our vector
+			++vector_index;
+
+			lua_pop(m_L, 1); // Pops off the recorded value, only the array and table key is left. Therefore it is now ready for the next iteration
+		}
+	}
+
+	luaClearStack();
+	return vector;
+}
+
+
+#endif // !LUASCRIPT_H

@@ -16,13 +16,35 @@ LuaScript::LuaScript(const std::string & filename)
 LuaScript::~LuaScript()
 {
 	// Closes Lua State on destruction
-	if (m_L != nullptr)
+	if (!isNull())
 		lua_close(m_L);
 }
 
-void LuaScript::printError(const std::string & variableName, const std::string & reason)
+bool LuaScript::isNull()
 {
-	std::cout << "Error: Can't get (" << variableName << "), " << reason << std::endl;
+	return (m_L == nullptr);
+}
+
+std::vector<std::string> LuaScript::getTableKeys(const std::string & table_name)
+{
+	std::vector<std::string> vec;
+
+	if (isNull())
+	{
+		printError(table_name, "script is not loaded");
+		return vec;
+	}
+
+	// GET TABLE
+	if (luaGetToStack(table_name))
+		if (lua_gettable(m_L, -1))
+
+	return vec;
+}
+
+void LuaScript::printError(const std::string & variable_name, const std::string & reason)
+{
+	std::cout << "Error: Can't get (" << variable_name << "), " << reason << "." << std::endl;
 }
 
 void LuaScript::luaClearStack()
@@ -32,17 +54,17 @@ void LuaScript::luaClearStack()
 	lua_pop(m_L, stack_count);
 }
 
-bool LuaScript::luaGetToStack(const std::string & variableName)
+bool LuaScript::luaGetToStack(const std::string & variable_name)
 {
 	bool is_global = true;
 	std::string var = "";
 
 	// Cycles through each variable in variable path [variableName] and checks if they're valid
-	for (unsigned int i = 0; i < variableName.size(); ++i)
+	for (unsigned int i = 0; i < variable_name.size(); ++i)
 	{
-		if (variableName.at(i) != '.')
+		if (variable_name.at(i) != '.')
 		{
-			var += variableName.at(i);
+			var += variable_name.at(i);
 		}
 		else
 		{
@@ -56,7 +78,7 @@ bool LuaScript::luaGetToStack(const std::string & variableName)
 
 			if (lua_isnil(m_L, -1)) // Check if pushed variable was valid
 			{
-				printError(variableName, var + " is not defined.");
+				printError(variable_name, var + " is not defined");
 				return false;
 			}
 			else
@@ -72,7 +94,7 @@ bool LuaScript::luaGetToStack(const std::string & variableName)
 
 	if (lua_isnil(m_L, -1))
 	{
-		printError(variableName, var + " is not defined.");
+		printError(variable_name, var + " is not defined");
 		return false;
 	}
 

@@ -1,5 +1,26 @@
 #include "LuaScript.h"
 
+void sum(LuaScript& script, int x, int y)
+{
+	if (script.isNull())
+		std::cout << "Script not loaded." << std::endl;
+
+	std::string func_name = "sum";
+
+	if (lua_getglobal(script.state(), func_name.c_str()))
+	{
+		lua_pushnumber(script.state(), x);
+		lua_pushnumber(script.state(), y);
+
+		lua_pcall(script.state(), 2, 1, 0);
+
+		std::cout << x << " + " << y << " = " << lua_tonumber(script.state(), -1) << std::endl;
+		lua_pop(script.state(), 1);
+	}
+	else
+		std::cout << "Can't load function." << func_name << std::endl;
+}
+
 int main()
 {
 	LuaScript lua_script("../scripts/lua_script.lua");
@@ -14,6 +35,8 @@ int main()
 	{
 		std::cout << i << std::endl;
 	}
+
+	sum(lua_script, 6, 9);
 
 	return 0;
 }
