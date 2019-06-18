@@ -24,7 +24,7 @@ public:
 	LuaScript(const std::string& filename);
 	~LuaScript();
 
-	lua_State* state() { return m_L; }
+	lua_State* getState() { return m_L; }
 
 	/*
 		@brief Checks if the lua_State is nullptr

@@ -10,3 +10,9 @@ struct =
 function sum(x, y)
 return (x + y);
 end
+
+function test()
+write("test function works");
+write("from variable struct.number "..struct.number);
+write(multiply(3, 23).." aw ye")
+end
