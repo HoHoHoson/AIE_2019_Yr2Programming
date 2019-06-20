@@ -82,7 +82,8 @@ int main()
 	//	std::cout << "Stack count = " << lua_gettop(lua_script.getState()) << std::endl;
 	//}
 
-	lua_script.getTableKeys("struct");
+	for (std::string s : lua_script.getTableKeys("struct.tab.inside"))
+		std::cout << s << std::endl;
 
 	std::cout << "Press ENTER to close window...";
 	getchar();

@@ -50,8 +50,8 @@ public:
 
 	/*
 		@brief Gets all the keys of the variables in 
-		@param [table_name] and
-		@return in a vector of string format
+		@param [table_name]
+		@return A string vector that contains the table's keys or an empty vector if the function fails fails
 	*/
 	std::vector<std::string> getTableKeys(const std::string& table_name);
 
@@ -63,6 +63,11 @@ private:
 		@param was not returned due to [reason]
 	*/
 	void printError(const std::string& variable_name, const std::string& reason);
+
+	/*
+		Loads Lua functions that I have typed up in c++ string format, should only be loaded once per lua_State
+	*/
+	void loadStringCode();
 
 	/*
 		Clears the Lua stack, should be done at the end of a function that is done with the Lua stack

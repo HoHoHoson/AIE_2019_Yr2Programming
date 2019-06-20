@@ -1,5 +1,7 @@
 #include "LuaScript.h"
 
+#include<sstream>
+
 LuaScript::LuaScript(const std::string & filename)
 {
 	// Creates and assigns Lua State
@@ -11,14 +13,15 @@ LuaScript::LuaScript(const std::string & filename)
 
 		lua_close(m_L);
 		m_L = nullptr;
+		return;
 	}
-	else
-	{
-		luaL_openlibs(m_L); // Load Lua libraries
 
-		if (lua_pcall(m_L, 0, 0, NULL) != 0) // Calls the script that was placed on the stack. It runs the script and/or makes its variables and functions available for use
-			std::cout << "Error: " << lua_tostring(m_L, -1) << std::endl;
-	}
+	luaL_openlibs(m_L); // Load Lua libraries
+
+	if (lua_pcall(m_L, 0, 0, NULL) != 0) // Calls the script that was placed on the stack. It runs the script and/or makes its variables and functions available for use
+		std::cout << "Error: " << lua_tostring(m_L, -1) << std::endl;
+
+	loadStringCode();
 }
 
 LuaScript::~LuaScript()
@@ -45,48 +48,26 @@ std::vector<std::string> LuaScript::getTableKeys(const std::string & table_name)
 
 	if (luaGetToStack(table_name))
 	{
-		//lua_pushnil(m_L);
+		lua_getglobal(m_L, "tableKeys");		 // tableKeys function returns a string that contains all the keys of a specified table from the Lua script
+		lua_pushstring(m_L, table_name.c_str()); // Push the path to the table variable onto the Lua stack
 
-		//while (lua_next(m_L, -2))
-		//{
-		//	lua_pop(m_L, 1);
-		//	vec.push_back(lua_tostring(m_L, -1));
-		//}
+		if (lua_pcall(m_L, 1, 1, 0))
+			printError(table_name, lua_tostring(m_L, -1));
+		else
+		{
+			std::istringstream token_stream(lua_tostring(m_L, -1));
 
-		std::string function_code =
-			"function codefunc(name) "
+			if (std::strcmp(token_stream.str().c_str(), "null"))
+			{
+				// Tokenise the chain of keys into individual strings and pushes them into a vector
+				std::string token;
 
-			"is_global = true;"
-			"table = nil;"
-			"s = \"struct.tab\";"
-
-			"for w in string.gmatch(s, \"%P+\") do "
-
-			"	if (is_global == true) "
-			"	then "
-			"		table = _G[w] print(\"then\") is_global = false "
-			"	else "
-			"		table = table[w] print(\"else\") "
-			"	end;"
-
-			"	print(table.inside) "
-
-			"end;"
-
-			"end";
-
-		if (luaL_loadstring(m_L, function_code.c_str()) != 0)
-			std::cout << lua_tostring(m_L, -1) << std::endl;
-
-		lua_pcall(m_L, 0, 0, NULL);
-
-		std::string s = "12 biubi fiwhf id 69";
-
-		lua_getglobal(m_L, "codefunc");
-		lua_pushstring(m_L, s.c_str());
-		lua_pcall(m_L, 1, 0, 0);
-
-		//std::cout << "codefunc returned: " << lua_tostring(m_L, -1) << std::endl;
+				while (std::getline(token_stream, token, ','))
+					vec.push_back(token);
+			}
+			else
+				printError(table_name + " [table keys]", "variable is not a table"); // Print an error if the specified path didn't lead to a table
+		}
 	}
 
 	luaClearStack();
@@ -96,6 +77,40 @@ std::vector<std::string> LuaScript::getTableKeys(const std::string & table_name)
 void LuaScript::printError(const std::string & variable_name, const std::string & reason)
 {
 	std::cout << "Error: can't get (" << variable_name << "), " << reason << "." << std::endl;
+}
+
+void LuaScript::loadStringCode()
+{
+	std::string function_code =
+		"function tableKeys(name) "
+
+		"	is_global = true;"
+		"	var = nil;"
+
+		"	for field in string.gmatch(name, \"%P+\") do "
+		"		if (is_global == true) "
+		"		then "
+		"			var = _G[field];"
+		"			is_global = false;"
+		"		else "
+		"			var = var[field] "
+		"		end;"
+		"	end;"
+
+		"	if (type(var) ~= \"table\") then return \"null\" end;"
+
+		"	str = \"\";"
+		"	for k, v in pairs(var) do "
+		"		str = str..k..\",\";"
+		"	end;"
+		"	return str;"
+
+		"end";
+
+	luaL_loadstring(m_L, function_code.c_str());
+
+	if (lua_pcall(m_L, 0, 0, NULL) != 0)
+		std::cout << "Error: tableKeys function couldn't be loaded to Lua." << std::endl;
 }
 
 void LuaScript::luaClearStack()
@@ -108,14 +123,15 @@ void LuaScript::luaClearStack()
 bool LuaScript::luaGetToStack(const std::string & variable_name)
 {
 	bool is_global = true;
+	std::string token_string = variable_name + "."; // Attaching the '.' at the end will let the for loop check the last variable, due to it only checking once it reaches a '.'
 	std::string var = "";
 
 	// Cycles through each variable in variable path [variableName] and checks if they're valid
-	for (unsigned int i = 0; i < variable_name.size(); ++i)
+	for (unsigned int i = 0; i < token_string.size(); ++i)
 	{
-		if (variable_name.at(i) != '.')
+		if (token_string.at(i) != '.')
 		{
-			var += variable_name.at(i);
+			var += token_string.at(i);
 		}
 		else
 		{
@@ -135,18 +151,6 @@ bool LuaScript::luaGetToStack(const std::string & variable_name)
 			else
 				var = "";
 		}
-	}
-
-	// Repeat the check once more due to the for loop only checking when there is  a '.'
-	if (is_global)
-		lua_getglobal(m_L, var.c_str());
-	else
-		lua_getfield(m_L, -1, var.c_str()); 
-
-	if (lua_isnil(m_L, -1))
-	{
-		printError(variable_name, var + " is not defined");
-		return false;
 	}
 
 	return true;
