@@ -1,12 +1,32 @@
 #include "LuaScript.h"
+#include "TestClass.h"
+
+void registerTestClass(lua_State* L)
+{
+	luaL_newmetatable(L, "TestClassMetatable");
+
+	lua_pushvalue(L, -1);
+	lua_setfield(L, -2, "__index");
+
+	lua_pushcfunction(L, l_write);
+	lua_setfield(L, -2, "write");
+}
 
 void write(const std::string& wordsToWrite)
 {
+
 	std::cout << wordsToWrite << std::endl;
 }
 
+
 static int l_write(lua_State* L) 
 {
+	if (lua_gettop(L) != 1)
+		std::cout << "Not the right amount of arguements" << std::endl;
+
+	TestClass** tc_ptr = static_cast<TestClass**>(luaL_checkudata(L, 1, "TestClassMetatable"));
+	std::cout << (*tc_ptr)->m_integer << " YAS" << std::endl;
+
 	const char* s = lua_tostring(L, -1); // get function argument
 	write(s); // calling C++ function
 	return 0; // nothing to return
@@ -54,6 +74,16 @@ void callLuaSum(LuaScript& script, int x, int y)
 int main()
 {
 	LuaScript lua_script("../scripts/lua_script.lua");
+
+	registerTestClass(lua_script.getState());
+
+	TestClass test_class;
+	TestClass** tclassptr = static_cast<TestClass**>(lua_newuserdata(lua_script.getState(), sizeof(TestClass)));
+
+	*(tclassptr) = &test_class;
+
+	luaL_setmetatable(lua_script.getState(), "TestClassMetatable");
+	lua_setglobal(lua_script.getState(), "test_class");
 
 	//std::cout << lua_script.get<float>("struct.tab.inside") << std::endl;
 	//std::cout << lua_script.get<std::string>("struct.words") << std::endl;
