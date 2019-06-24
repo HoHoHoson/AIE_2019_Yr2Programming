@@ -2,49 +2,36 @@
 
 #include<sstream>
 
-LuaScript::LuaScript(const std::string & filename)
+LuaScript::LuaScript()
 {
 	// Creates and assigns Lua State
 	m_L = luaL_newstate();
 
-	if (luaL_loadfile(m_L, filename.c_str())) // Attempts to load the script at [filepath] onto the Lua stack, it needs to be ran by lua_pcall before it can be used
-	{
-		std::cout << "Error: " << lua_tostring(m_L, -1) << std::endl; // Print error message on script loading failure
-
-		lua_close(m_L);
-		m_L = nullptr;
-		return;
-	}
-
 	luaL_openlibs(m_L); // Load Lua libraries
-
-	if (lua_pcall(m_L, 0, 0, NULL) != 0) // Calls the script that was placed on the stack. It runs the script and/or makes its variables and functions available for use
-		std::cout << "Error: " << lua_tostring(m_L, -1) << std::endl;
-
-	loadStringCode();
+	loadStringCode(); // Load the Lua functions that were made in c++ string
 }
 
 LuaScript::~LuaScript()
 {
 	// Closes Lua State on destruction
-	if (m_L != nullptr)
-		lua_close(m_L);
+	lua_close(m_L);
 }
 
-bool LuaScript::isNull()
+void LuaScript::loadScript(const std::string & file_path)
 {
-	return (m_L == nullptr);
+	if (luaL_loadfile(m_L, file_path.c_str())) // Attempts to load the script at [filepath] onto the Lua stack, it needs to be ran by lua_pcall before it can be used
+	{
+		std::cout << "Error: " << lua_tostring(m_L, -1) << std::endl; // Print error message on script loading failure
+	}
+	else if (lua_pcall(m_L, 1, 0, NULL)) // Calls the script that was placed on the stack. It runs the script and/or makes its variables and functions available for use
+		printError(file_path, "lua_pcall failure - " + (std::string)lua_tostring(m_L, -1));
+
+	luaClearStack();
 }
 
 std::vector<std::string> LuaScript::getTableKeys(const std::string & table_name)
 {
 	std::vector<std::string> vec;
-
-	if (isNull())
-	{
-		printError(table_name, "script is not loaded");
-		return vec;
-	}
 
 	if (luaGetToStack(table_name))
 	{
@@ -52,12 +39,12 @@ std::vector<std::string> LuaScript::getTableKeys(const std::string & table_name)
 		lua_pushstring(m_L, table_name.c_str()); // Push the path to the table variable onto the Lua stack
 
 		if (lua_pcall(m_L, 1, 1, 0))
-			printError(table_name, lua_tostring(m_L, -1));
+			printError(table_name, "lua_pcall failure - " + (std::string)lua_tostring(m_L, -1));
 		else
 		{
 			std::istringstream token_stream(lua_tostring(m_L, -1));
 
-			if (std::strcmp(token_stream.str().c_str(), "null"))
+			if (std::strcmp(token_stream.str().c_str(), "null") != 0)
 			{
 				// Tokenise the chain of keys into individual strings and pushes them into a vector
 				std::string token;
@@ -107,17 +94,19 @@ void LuaScript::loadStringCode()
 
 		"end";
 
-	luaL_loadstring(m_L, function_code.c_str());
-
-	if (lua_pcall(m_L, 0, 0, NULL) != 0)
-		std::cout << "Error: tableKeys function couldn't be loaded to Lua." << std::endl;
+	if (luaL_loadstring(m_L, function_code.c_str()))
+	{
+		printError("tableKeys", lua_tostring(m_L, -1));
+	}
+	else if (lua_pcall(m_L, 1, 0, 0))
+	{
+		printError("tableKeys", "lua_pcall failure - " + (std::string)lua_tostring(m_L, -1));
+	}
 }
 
 void LuaScript::luaClearStack()
 {
-	int stack_count = lua_gettop(m_L);
-
-	lua_pop(m_L, stack_count);
+	lua_settop(m_L, 0);
 }
 
 bool LuaScript::luaGetToStack(const std::string & variable_name)
@@ -145,7 +134,7 @@ bool LuaScript::luaGetToStack(const std::string & variable_name)
 
 			if (lua_isnil(m_L, -1)) // Check if pushed variable was valid
 			{
-				printError(variable_name, var + " is not defined");
+				printError(variable_name, var + " is nil");
 				return false;
 			}
 			else

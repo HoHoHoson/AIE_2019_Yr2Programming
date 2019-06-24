@@ -21,16 +21,16 @@ class LuaScript
 {
 public:
 
-	LuaScript(const std::string& filename);
+	LuaScript();
 	~LuaScript();
 
 	lua_State* getState() { return m_L; }
 
 	/*
-		@brief Checks if the lua_State is nullptr
-		@returns True if so, False otherwise
+		@brief Loads a Lua script from the
+		@param specified filepath
 	*/
-	bool isNull();
+	void loadScript(const std::string& filePath);
 
 	/*
 		@brief Gets a variable from the Lua script
@@ -148,12 +148,6 @@ inline std::string LuaScript::luaGet(const std::string& variable_name)
 template<typename T>
 inline T LuaScript::get(const std::string & variable_name)
 {
-	if (isNull())
-	{
-		printError(variable_name, "script is not loaded");
-		return luaGetDefault<T>();
-	}
-
 	T result;
 
 	if (luaGetToStack(variable_name)) // Checks to see if variable exists, places it on stack if it does
@@ -170,12 +164,6 @@ template<typename T>
 inline std::vector<T> LuaScript::getVector(const std::string & vector_name)
 {
 	std::vector<T> vector;
-
-	if (isNull())
-	{
-		printError(vector_name, "script is not loaded");
-		return vector;
-	}
 
 	if (luaGetToStack(vector_name))
 	{

@@ -1,16 +1,6 @@
 #include "LuaScript.h"
 #include "TestClass.h"
 
-void registerTestClass(lua_State* L)
-{
-	luaL_newmetatable(L, "TestClassMetatable");
-
-	lua_pushvalue(L, -1);
-	lua_setfield(L, -2, "__index");
-
-	lua_pushcfunction(L, l_write);
-	lua_setfield(L, -2, "write");
-}
 
 void write(const std::string& wordsToWrite)
 {
@@ -27,9 +17,20 @@ static int l_write(lua_State* L)
 	TestClass** tc_ptr = static_cast<TestClass**>(luaL_checkudata(L, 1, "TestClassMetatable"));
 	std::cout << (*tc_ptr)->m_integer << " YAS" << std::endl;
 
-	const char* s = lua_tostring(L, -1); // get function argument
-	write(s); // calling C++ function
+	//const char* s = lua_tostring(L, -1); // get function argument
+	//write(s); // calling C++ function
 	return 0; // nothing to return
+}
+
+void registerTestClass(lua_State* L)
+{
+	luaL_newmetatable(L, "TestClassMetatable");
+
+	lua_pushvalue(L, -1);
+	lua_setfield(L, -2, "__index");
+
+	lua_pushcfunction(L, l_write);
+	lua_setfield(L, -2, "fun");
 }
 
 float multiply(float x, float y)
@@ -39,8 +40,8 @@ float multiply(float x, float y)
 
 static int l_multiply(lua_State* L)
 {
-	float x = lua_tonumber(L, -2);
-	float y = lua_tonumber(L, -1);
+	float x = (float)lua_tonumber(L, -2);
+	float y = (float)lua_tonumber(L, -1);
 
 	lua_pushnumber(L, multiply(x, y));
 
@@ -49,12 +50,6 @@ static int l_multiply(lua_State* L)
 
 void callLuaSum(LuaScript& script, int x, int y)
 {
-	if (script.isNull())
-	{
-		std::cout << "Script not loaded." << std::endl;
-		return;
-	}
-
 	std::string func_name = "sum";
 
 	if (lua_getglobal(script.getState(), func_name.c_str()))
@@ -73,10 +68,11 @@ void callLuaSum(LuaScript& script, int x, int y)
 
 int main()
 {
-	LuaScript lua_script("../scripts/lua_script.lua");
+	LuaScript lua_script;
+	lua_script.loadScript("../scripts/lua_script.lua");
+	std::cout << "Stack count = " << lua_gettop(lua_script.getState()) << std::endl; //Stack count checker
 
 	registerTestClass(lua_script.getState());
-
 	TestClass test_class;
 	TestClass** tclassptr = static_cast<TestClass**>(lua_newuserdata(lua_script.getState(), sizeof(TestClass)));
 
@@ -85,7 +81,11 @@ int main()
 	luaL_setmetatable(lua_script.getState(), "TestClassMetatable");
 	lua_setglobal(lua_script.getState(), "test_class");
 
-	//std::cout << lua_script.get<float>("struct.tab.inside") << std::endl;
+
+	lua_getglobal(lua_script.getState(), "test");
+	lua_pcall(lua_script.getState(), 0, 0, 0);
+
+	std::cout << lua_script.get<float>("struct.tab.inside") << std::endl;
 	//std::cout << lua_script.get<std::string>("struct.words") << std::endl;
 	//std::cout << lua_script.get<int>("struct.words") << std::endl;
 
@@ -112,8 +112,8 @@ int main()
 	//	std::cout << "Stack count = " << lua_gettop(lua_script.getState()) << std::endl;
 	//}
 
-	for (std::string s : lua_script.getTableKeys("struct.tab.inside"))
-		std::cout << s << std::endl;
+	//for (std::string s : lua_script.getTableKeys("struct.tab.inside"))
+	//	std::cout << s << std::endl;
 
 	std::cout << "Press ENTER to close window...";
 	getchar();

@@ -7,5 +7,5 @@ public:
 	TestClass() {}
 	~TestClass() {}
 
-	int m_integer;
+	int m_integer = 69;
 };
