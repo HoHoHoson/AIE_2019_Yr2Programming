@@ -1,4 +1,5 @@
 #include "LuaScript.h"
+#include "TestClass.h"
 
 #include<sstream>
 
@@ -8,6 +9,7 @@ LuaScript::LuaScript()
 	m_L = luaL_newstate();
 
 	luaL_openlibs(m_L); // Load Lua libraries
+	registerTestClass(m_L); // Register a C++ object to Lua
 	loadStringCode(); // Load the Lua functions that were made in c++ string
 }
 
@@ -23,7 +25,7 @@ void LuaScript::loadScript(const std::string & file_path)
 	{
 		std::cout << "Error: " << lua_tostring(m_L, -1) << std::endl; // Print error message on script loading failure
 	}
-	else if (lua_pcall(m_L, 1, 0, NULL)) // Calls the script that was placed on the stack. It runs the script and/or makes its variables and functions available for use
+	else if (lua_pcall(m_L, 0, 0, NULL)) // Calls the script that was placed on the stack. It runs the script and/or makes its variables and functions available for use
 		printError(file_path, "lua_pcall failure - " + (std::string)lua_tostring(m_L, -1));
 
 	luaClearStack();
@@ -98,7 +100,7 @@ void LuaScript::loadStringCode()
 	{
 		printError("tableKeys", lua_tostring(m_L, -1));
 	}
-	else if (lua_pcall(m_L, 1, 0, 0))
+	else if (lua_pcall(m_L, 0, 0, 0))
 	{
 		printError("tableKeys", "lua_pcall failure - " + (std::string)lua_tostring(m_L, -1));
 	}

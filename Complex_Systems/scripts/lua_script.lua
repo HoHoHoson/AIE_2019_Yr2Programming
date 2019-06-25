@@ -12,5 +12,11 @@ return (x + y);
 end
 
 function test()
-test_class:fun()
+
+newClass = TestClass(123);
+print(newClass:get());
+
+newClass:set(69);
+print(newClass:get());
+
 end

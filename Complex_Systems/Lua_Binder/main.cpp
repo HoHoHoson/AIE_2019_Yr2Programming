@@ -1,86 +1,10 @@
 #include "LuaScript.h"
-#include "TestClass.h"
-
-
-void write(const std::string& wordsToWrite)
-{
-
-	std::cout << wordsToWrite << std::endl;
-}
-
-
-static int l_write(lua_State* L) 
-{
-	if (lua_gettop(L) != 1)
-		std::cout << "Not the right amount of arguements" << std::endl;
-
-	TestClass** tc_ptr = static_cast<TestClass**>(luaL_checkudata(L, 1, "TestClassMetatable"));
-	std::cout << (*tc_ptr)->m_integer << " YAS" << std::endl;
-
-	//const char* s = lua_tostring(L, -1); // get function argument
-	//write(s); // calling C++ function
-	return 0; // nothing to return
-}
-
-void registerTestClass(lua_State* L)
-{
-	luaL_newmetatable(L, "TestClassMetatable");
-
-	lua_pushvalue(L, -1);
-	lua_setfield(L, -2, "__index");
-
-	lua_pushcfunction(L, l_write);
-	lua_setfield(L, -2, "fun");
-}
-
-float multiply(float x, float y)
-{
-	return x * y;
-}
-
-static int l_multiply(lua_State* L)
-{
-	float x = (float)lua_tonumber(L, -2);
-	float y = (float)lua_tonumber(L, -1);
-
-	lua_pushnumber(L, multiply(x, y));
-
-	return 1;
-}
-
-void callLuaSum(LuaScript& script, int x, int y)
-{
-	std::string func_name = "sum";
-
-	if (lua_getglobal(script.getState(), func_name.c_str()))
-	{
-		lua_pushnumber(script.getState(), x);
-		lua_pushnumber(script.getState(), y);
-
-		lua_pcall(script.getState(), 2, 1, 0);
-
-		std::cout << x << " + " << y << " = " << lua_tonumber(script.getState(), -1) << std::endl;
-		lua_pop(script.getState(), 1);
-	}
-	else
-		std::cout << "Can't load function." << func_name << std::endl;
-}
 
 int main()
 {
 	LuaScript lua_script;
 	lua_script.loadScript("../scripts/lua_script.lua");
 	std::cout << "Stack count = " << lua_gettop(lua_script.getState()) << std::endl; //Stack count checker
-
-	registerTestClass(lua_script.getState());
-	TestClass test_class;
-	TestClass** tclassptr = static_cast<TestClass**>(lua_newuserdata(lua_script.getState(), sizeof(TestClass)));
-
-	*(tclassptr) = &test_class;
-
-	luaL_setmetatable(lua_script.getState(), "TestClassMetatable");
-	lua_setglobal(lua_script.getState(), "test_class");
-
 
 	lua_getglobal(lua_script.getState(), "test");
 	lua_pcall(lua_script.getState(), 0, 0, 0);
