@@ -120,6 +120,9 @@
     <ClCompile Include="src\lzio.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\LuaScript.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\lapi.h">
@@ -199,6 +202,9 @@
     </ClInclude>
     <ClInclude Include="src\lzio.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LuaScript.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

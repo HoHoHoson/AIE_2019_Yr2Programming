@@ -72,22 +72,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(ProjectDir)lib\$(Platform)</OutDir>
+    <OutDir>$(ProjectDir)lib</OutDir>
     <IntDir>temp\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(ProjectDir)lib\$(Platform)</OutDir>
+    <OutDir>$(ProjectDir)lib</OutDir>
     <IntDir>temp\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(ProjectDir)lib\$(Platform)</OutDir>
+    <OutDir>$(ProjectDir)lib</OutDir>
     <IntDir>temp\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(ProjectDir)lib\$(Platform)</OutDir>
+    <OutDir>$(ProjectDir)lib</OutDir>
     <IntDir>temp\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -190,6 +190,7 @@
     <ClCompile Include="src\ltm.c" />
     <ClCompile Include="src\lua.c" />
     <ClCompile Include="src\luac.c" />
+    <ClCompile Include="src\LuaScript.cpp" />
     <ClCompile Include="src\lundump.c" />
     <ClCompile Include="src\lutf8lib.c" />
     <ClCompile Include="src\lvm.c" />
@@ -219,6 +220,7 @@
     <ClInclude Include="src\lua.hpp" />
     <ClInclude Include="src\luaconf.h" />
     <ClInclude Include="src\lualib.h" />
+    <ClInclude Include="src\LuaScript.h" />
     <ClInclude Include="src\lundump.h" />
     <ClInclude Include="src\lvm.h" />
     <ClInclude Include="src\lzio.h" />
