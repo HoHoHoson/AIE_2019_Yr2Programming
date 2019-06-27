@@ -26,11 +26,17 @@ public:
 
 	lua_State* getState() { return m_L; }
 
-	/*
+	/**
 		@brief Loads a Lua script from the
 		@param specified filepath
 	*/
 	void loadScript(const std::string& filePath);
+
+	/**
+		Cleans out the lua_State and loads back in default loaded states, 
+		manually loaded in scripts must be reloaded by the user
+	*/
+	void reloadLuaState();
 
 	/*
 		@brief Gets a variable from the Lua script

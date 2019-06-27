@@ -29,6 +29,16 @@ void LuaScript::loadScript(const std::string & file_path)
 	luaClearStack();
 }
 
+void LuaScript::reloadLuaState()
+{
+	lua_close(m_L);
+
+	m_L = luaL_newstate();
+
+	luaL_openlibs(m_L); 
+	loadStringCode(); 
+}
+
 std::vector<std::string> LuaScript::getTableKeys(const std::string & table_name)
 {
 	std::vector<std::string> vec;
