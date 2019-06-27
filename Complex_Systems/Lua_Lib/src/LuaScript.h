@@ -33,8 +33,7 @@ public:
 	void loadScript(const std::string& filePath);
 
 	/**
-		Cleans out the lua_State and loads back in default loaded states, 
-		manually loaded in scripts must be reloaded by the user
+		Cleans out the lua_State and loads back in default loaded states, manually loaded in scripts must be reloaded by the user
 	*/
 	void reloadLuaState();
 

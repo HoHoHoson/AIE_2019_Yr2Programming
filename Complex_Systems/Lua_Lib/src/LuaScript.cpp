@@ -25,7 +25,7 @@ void LuaScript::loadScript(const std::string & file_path)
 	}
 	else if (lua_pcall(m_L, 0, 0, NULL)) // Calls the script that was placed on the stack. It runs the script and/or makes its variables and functions available for use
 		printError(file_path, "lua_pcall failure - " + (std::string)lua_tostring(m_L, -1));
-
+	
 	luaClearStack();
 }
 

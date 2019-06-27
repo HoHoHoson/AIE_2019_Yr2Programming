@@ -1,40 +1,39 @@
 #include "LuaScript.h"
 #include "TestClass.h"
 
-void luaTest(lua_State* L)
+void luaFunFunct(lua_State* L)
 {
-	lua_getglobal(L, "test");
+	lua_getglobal(L, "funFunct");
 
-	if (lua_pcall(L, 1, 0, 0))
-		std::cout << "Error: can't run Lua function \"test\", lua_pcall error - " << lua_tostring(L, -1) << std::endl;
+	if (lua_pcall(L, 0, 0, 0))
+		std::cout << "Error: can't run Lua function \"funFunct\", lua_pcall error - " << lua_tostring(L, -1) << std::endl;
 }
 
 int main()
 {
 	LuaScript lua_script;
+
+	std::cout << "From C++ : Attempting to load \"lua_script.lua\"" << std::endl;
 	lua_script.loadScript("../scripts/lua_script.lua");
 
 	registerTestClass(lua_script.getState());
-	luaTest(lua_script.getState());
+	std::cout << "\nFrom C++ : \"TestClass\" has been binded to Lua\n" << std::endl;
 
-	std::cout << "Stack count = " << lua_gettop(lua_script.getState()) << std::endl; //Stack count checker
+	std::cout << "From C++ : Calling Lua Binder's [getTableKeys(\"tableA\")] returns -> " << std::endl;
+	for (std::string s : lua_script.getTableKeys("tableA"))
+		std::cout << s << std::endl;
 
-	std::cout << lua_script.get<float>("struct.tab.inside") << std::endl;
-	std::cout << lua_script.get<std::string>("struct.words") << std::endl;
-	std::cout << lua_script.get<int>("struct.words") << std::endl;
+	std::cout << "\nFrom C++ : Calling Lua Binder's [get<float>(\"tableA.my_float\")] returns -> "<< lua_script.get<float>("tableA.my_float") << std::endl;
+	std::cout << "From C++ : Calling Lua Binder's [get<std::string>(\"tableA.my_string\")] returns -> " << lua_script.get<std::string>("tableA.my_string") << std::endl;
 
-	std::vector<std::string> test_vec(lua_script.getVector<std::string>("struct.intvector"));
-
-	for (std::string i : test_vec)
+	std::cout << "\nFrom C++ : Calling Lua Binder's [getVector<std::string>(\"tableA.my_int_array\")] returns -> " << std::endl;
+	for (std::string i : lua_script.getVector<std::string>("tableA.my_int_array"))
 		std::cout << i << std::endl;
 
-	for (std::string s : lua_script.getTableKeys("struct"))
-		std::cout << s << std::endl;
+	std::cout << "\nFrom C++ : Calling \"lua_script.lua\" global function, [funFunct]" << std::endl;
+	luaFunFunct(lua_script.getState());
 
-	for (std::string s : lua_script.getTableKeys("struct.tab.inside"))
-		std::cout << s << std::endl;
-
-	std::cout << "Press ENTER to close window...";
+	std::cout << "\nPress ENTER to close window...";
 	getchar();
 	return 0;
 }
