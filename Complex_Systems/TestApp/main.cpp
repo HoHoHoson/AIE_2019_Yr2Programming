@@ -17,7 +17,7 @@ int main()
 	lua_script.loadScript("../scripts/lua_script.lua");
 
 	registerTestClass(lua_script.getState());
-	std::cout << "\nFrom C++ : \"TestClass\" has been binded to Lua\n" << std::endl;
+	std::cout << "\nFrom C++ : C++ class [TestClass] has been binded to Lua\n" << std::endl;
 
 	std::cout << "From C++ : Calling Lua Binder's [getTableKeys(\"tableA\")] returns -> " << std::endl;
 	for (std::string s : lua_script.getTableKeys("tableA"))

@@ -50,3 +50,7 @@ Complex_Systems/Lua_Binder/Debug/
 Complex_Systems/Lua_Binder/x64/
 
 Complex_Systems/Lua_Lib/temp/
+
+Complex_Systems/Release/
+
+Complex_Systems/TestApp/Release/
